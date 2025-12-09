@@ -42,7 +42,7 @@ public class Arrival
     ///   Route name of the train in this arrival prediction
     /// </summary>
     [JsonPropertyName("rt")]
-    public string Route { get; set; }
+    public Route Route { get; set; }
 
     /// <summary>
     ///   GTFS unique stop ID where this train is expected to ultimately end its service run
