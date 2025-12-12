@@ -14,5 +14,5 @@ public class CtaApiResult
     ///   Numeric station identifier. Required if StopId is not specified
     /// </summary>
     [JsonPropertyName("ctatt")]
-    public ArrivalsResponse? Response { get; set; }
+    public required ArrivalsResponse Response { get; set; }
 }
