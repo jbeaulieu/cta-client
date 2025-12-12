@@ -1,3 +1,4 @@
+using System.Reflection;
 using System.Text.Json.Serialization;
 
 namespace CtaClient.Models;
@@ -21,4 +22,31 @@ public enum Route
     Purple,
     [JsonStringEnumMemberName("Y")]
     Yellow
+}
+
+public static class RouteExtensions
+{
+    /// <summary>
+    ///   Static helper utility that uses Reflection to return the route code as used by the CTA. This method is called when
+    ///     the Client calls a CTA API endpoint with a route query parameter, and needs to serialize the route name to the
+    ///     value expected by the CTA.
+    /// </summary>
+    /// <param name="route"></param>
+    /// <returns>String of the route code as used by the CTA API</returns>
+    /// <exception cref="ArgumentException"></exception>
+    public static string ToServiceId(this Route route)
+    {
+        string? name = Enum.GetName(typeof(Route), route);
+        if (name != null)
+        {
+            FieldInfo? field = typeof(Route).GetField(name);
+            if (field != null &&
+                Attribute.GetCustomAttribute(field, typeof(JsonStringEnumMemberNameAttribute)) is JsonStringEnumMemberNameAttribute attr)
+            {
+                return attr.Name;
+            }
+        }
+
+        throw new ArgumentException($"Invalid enum for Route: {route}");
+    }
 }
