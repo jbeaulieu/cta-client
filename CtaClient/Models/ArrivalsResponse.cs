@@ -17,7 +17,7 @@ public class ArrivalsResponse
     ///   Numeric error code
     /// </summary>
     [JsonPropertyName("errCd")]
-    public int ErrorCode { get; set; }
+    public ErrorCode ErrorCode { get; set; }
 
     /// <summary>
     ///   Textual error description/message

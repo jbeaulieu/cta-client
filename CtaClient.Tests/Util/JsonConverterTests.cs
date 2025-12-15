@@ -44,8 +44,8 @@ public class JsonConverterTests
         Assert.IsType<DateTimeOffset>(result.Timestamp);
         Assert.Equal(DateTimeOffset.Parse("2025-12-05T17:54:32", new CultureInfo("en-US")), result.Timestamp);
 
-        Assert.IsType<int>(result.ErrorCode);
-        Assert.Equal(100, result.ErrorCode);
+        Assert.IsType<ErrorCode>(result.ErrorCode);
+        Assert.Equal(ErrorCode.MissingParameter, result.ErrorCode);
 
         Assert.IsType<string>(result.ErrorName);
         Assert.Equal("Required parameter 'key' is missing.", result.ErrorName);
