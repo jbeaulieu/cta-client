@@ -5,7 +5,7 @@ namespace CtaClient.Exceptions;
 /// <summary>
 ///   Exception thrown when a required parameter is missing.
 /// </summary>
-public class MissingParameterException : CtaBaseException
+public class MissingParameterException : CtaException
 {
     public MissingParameterException() : base(ErrorCode.MissingParameter) { }
     public MissingParameterException(string? message) : base(ErrorCode.MissingParameter, message) { }

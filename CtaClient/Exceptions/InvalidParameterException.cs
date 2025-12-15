@@ -5,7 +5,7 @@ namespace CtaClient.Exceptions;
 /// <summary>
 ///   Exception thrown when a supplied parameter is invalid.
 /// </summary>
-public class InvalidParameterException : CtaBaseException
+public class InvalidParameterException : CtaException
 {
     public InvalidParameterException(ErrorCode errorCode) : base(errorCode) { }
     public InvalidParameterException(ErrorCode errorCode, string? message) : base(errorCode, message) { }
