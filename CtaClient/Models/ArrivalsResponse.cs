@@ -23,7 +23,7 @@ public class ArrivalsResponse
     ///   Textual error description/message
     /// </summary>
     [JsonPropertyName("errNm")]
-    public string? ErrorName { get; set; }
+    public string? ErrorDescription { get; set; }
 
     /// <summary>
     ///   List of arrival predictions

@@ -47,8 +47,8 @@ public class JsonConverterTests
         Assert.IsType<ErrorCode>(result.ErrorCode);
         Assert.Equal(ErrorCode.MissingParameter, result.ErrorCode);
 
-        Assert.IsType<string>(result.ErrorName);
-        Assert.Equal("Required parameter 'key' is missing.", result.ErrorName);
+        Assert.IsType<string>(result.ErrorDescription);
+        Assert.Equal("Required parameter 'key' is missing.", result.ErrorDescription);
 
         Assert.IsType<List<Arrival>>(result.Arrivals);
         Assert.Equal(2, result.Arrivals.Count);

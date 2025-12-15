@@ -74,7 +74,7 @@ public enum ErrorCode
     /// <summary>
     ///   At least one of the supplied values for the StopId parameter is not an integer
     /// </summary>
-    NonIntegerStopId = 112,
+    StopIdNotInteger = 112,
 
     /// <summary>
     ///   The query contains a parameter that is not supported by the train tracker API
