@@ -1,0 +1,51 @@
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+
+name: Test
+on:
+  workflow_dispatch: # Allow running the workflow manually from the GitHub UI
+  push:
+    branches:
+      - 'main'       # Run the workflow when pushing to the main branch
+  pull_request:
+    types: [opened, synchronize, reopened]          # Run the workflow for all pull requests
+
+env:
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+  DOTNET_NOLOGO: true
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+defaults:
+  run:
+    shell: pwsh
+
+jobs:
+  run_test:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v6
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v5
+      with:
+        dotnet-version: '10.0.x'
+    - name: Run tests
+      run: dotnet test
+
+  sonar_scan:
+    name: Sonar Quality Gate
+    runs-on: ubuntu-latest
+    steps:
+    - name: SonarScanner for .NET 10
+      uses: highbyte/sonarscan-dotnet@v2.5.0
+      with:
+        # The key of the SonarQube project
+        sonarProjectKey: jbeaulieu_cta-client
+        # The name of the SonarQube project
+        sonarProjectName:  cta-client
+        # The name of the SonarQube organization in SonarCloud
+        sonarOrganization: jbeaulieu
+        # Optional command arguments to dotnet test
+        dotnetTestArguments: --logger trx --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover
+        # Optional extra command arguments the the SonarScanner 'begin' command
+        sonarBeginArguments: /d:sonar.cs.opencover.reportsPaths="**/TestResults/**/coverage.opencover.xml" -d:sonar.cs.vstest.reportsPaths="**/TestResults/*.trx"
