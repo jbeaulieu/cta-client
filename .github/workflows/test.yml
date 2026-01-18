@@ -20,7 +20,7 @@ defaults:
     shell: pwsh
 
 jobs:
-  run_test:
+  run_tests:
     name: Unit Tests
     runs-on: ubuntu-latest
     steps:
@@ -34,6 +34,7 @@ jobs:
 
   sonar_scan:
     name: Quality Gate
+    needs: run_tests
     runs-on: windows-latest
     steps:
       - name: Set up JDK 17
