@@ -64,6 +64,9 @@ jobs:
         run: |
           New-Item -Path ${{ runner.temp }}\scanner -ItemType Directory
           dotnet tool update dotnet-sonarscanner --tool-path ${{ runner.temp }}\scanner
+      - name: Install Coverlet
+        shell: powershell
+        run: dotnet tool install --global coverlet.console
       - name: Build and analyze
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -71,4 +74,5 @@ jobs:
         run: |
           ${{ runner.temp }}\scanner\dotnet-sonarscanner begin /k:"jbeaulieu_cta-client" /o:"jbeaulieu" /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
           dotnet build
+          coverlet .\CtaClient.Tests\bin\Debug\net10.0\CtaClient.Tests.dll --target "dotnet" --targetargs "test --no-build" -f=opencover -o="coverage.xml"
           ${{ runner.temp }}\scanner\dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
