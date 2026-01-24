@@ -28,6 +28,28 @@ public class CtaEndpointFactoryTests
         baseExpectedResponse = $"{mockBaseAddress}?key={mockApiKey}&outputType=JSON";
     }
 
+    [Theory]
+    [InlineData("")]
+    [InlineData("   ")]
+    [InlineData(null)]
+    public void CtaEndpointFactory_MissingApiKey_Throws(string? apiKey)
+    {
+        var misconfiguredOptions = Options.Create(new CtaApiSettings{ ApiKey = apiKey!, BaseAddress = mockBaseAddress });
+
+        Assert.Throws<ArgumentNullException>(() => new CtaEndpointFactory(misconfiguredOptions));
+    }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData("   ")]
+    [InlineData(null)]
+    public void CtaEndpointFactory_MissingBaseAddress_Throws(string? baseAddress)
+    {
+        var misconfiguredOptions = Options.Create(new CtaApiSettings{ ApiKey = mockApiKey, BaseAddress = baseAddress! });
+
+        Assert.Throws<ArgumentNullException>(() => new CtaEndpointFactory(misconfiguredOptions));
+    }
+
     [Fact]
     public void CtaEndpointFactory_GetArrivals_MapId_OmitsStopIdParam()
     {

@@ -9,6 +9,9 @@
     <VersionPrefix>0.1.0</VersionPrefix>
     <VersionSuffix>$(VersionSuffix)</VersionSuffix>
     <Authors>Jon Beaulieu</Authors>
+    <IsPackable>false</IsPackable>
+    <!-- Exclude project from code coverage analysis -->
+    <SonarQubeExclude>true</SonarQubeExclude>
   </PropertyGroup>
 
   <ItemGroup>

@@ -44,7 +44,7 @@ public class CtaClientTests
     }
 
     [Fact]
-    public async Task GetIdentity_Runs()
+    public async Task Client_GetArrivals_Runs()
     {
         var httpMessageHandler = new Mock<HttpMessageHandler>();
         httpMessageHandler.Protected()
@@ -63,6 +63,7 @@ public class CtaClientTests
         var client = CreateCtaClient(httpMessageHandler);
         var result = await client.Object.GetArrivals(request);
 
+        Assert.Single(httpMessageHandler.Invocations);
         Assert.IsType<ArrivalsResponse>(result);
         Assert.Single(result.Arrivals);
         Assert.Equal(Route.Red, result.Arrivals[0].Route);
