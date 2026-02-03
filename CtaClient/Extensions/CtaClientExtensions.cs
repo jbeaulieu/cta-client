@@ -1,5 +1,4 @@
 using CtaClient.Config;
-using CtaClient.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 

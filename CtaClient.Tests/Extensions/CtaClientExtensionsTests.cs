@@ -1,7 +1,6 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using CtaClient.Extensions;
-using CtaClient.Interfaces;
 
 namespace CtaClient.Tests.Extensions;
 

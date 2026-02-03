@@ -5,8 +5,8 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using CtaClient.Exceptions;
 using CtaClient.Extensions;
+using CtaClient.Json;
 using CtaClient.Models;
-using CtaClient.Util;
 
 namespace CtaClient.Tests.Extensions;
 

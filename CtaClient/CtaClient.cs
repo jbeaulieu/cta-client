@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
 using CtaClient.Extensions;
-using CtaClient.Interfaces;
 using CtaClient.Models;
 
 namespace CtaClient;

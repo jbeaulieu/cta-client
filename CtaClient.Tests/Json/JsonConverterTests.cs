@@ -2,10 +2,10 @@ using System.Globalization;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using CtaClient.Json;
 using CtaClient.Models;
-using CtaClient.Util;
 
-namespace CtaClient.Tests.Util;
+namespace CtaClient.Tests.Json;
 
 public class JsonConverterTests
 {

@@ -1,6 +1,6 @@
 using CtaClient.Models;
 
-namespace CtaClient.Interfaces;
+namespace CtaClient;
 
 public interface ICtaClient
 {
