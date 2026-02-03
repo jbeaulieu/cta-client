@@ -4,12 +4,12 @@ using Microsoft.Extensions.Options;
 
 namespace CtaClient;
 
-public class CtaEndpointFactory
+internal class CtaEndpointFactory
 {
     private string BaseAddress { get; set; }
     private string ApiKey { get; set; }
 
-    public CtaEndpointFactory(IOptions<CtaApiSettings> apiSettings)
+    internal CtaEndpointFactory(IOptions<CtaApiSettings> apiSettings)
     {
         if (string.IsNullOrWhiteSpace(apiSettings.Value.BaseAddress) ||
             string.IsNullOrWhiteSpace(apiSettings.Value.ApiKey))
@@ -24,7 +24,7 @@ public class CtaEndpointFactory
     /// <summary>
     ///   Validates and formats a uri request for the CTA Arrivals endpoint
     /// </summary>
-    public Uri GetArrvialsEndpoint(ArrivalsRequest request)
+    internal Uri GetArrvialsEndpoint(ArrivalsRequest request)
     {
         // Validation: Exactly one of request.MapId and request.StopId should be populated.
         if ((request.MapId != null && request.StopId != null) || (request.MapId == null && request.StopId == null))

@@ -44,7 +44,7 @@ public static class RouteExtensions
     /// <param name="route"></param>
     /// <returns>String of the route code as used by the CTA API</returns>
     /// <exception cref="ArgumentException"></exception>
-    public static string GetServiceId(this Route route)
+    internal static string GetServiceId(this Route route)
     {
         string? name = Enum.GetName(typeof(Route), route);
         if (name != null)

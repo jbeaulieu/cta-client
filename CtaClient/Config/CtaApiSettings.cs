@@ -1,7 +1,7 @@
 namespace CtaClient.Config;
 
-public class CtaApiSettings
+internal class CtaApiSettings
 {
-    public virtual string ApiKey { get; set; } = "";
-    public virtual string BaseAddress { get; set; } = "";
+    internal string ApiKey { get; set; } = "";
+    internal string BaseAddress { get; set; } = "";
 }

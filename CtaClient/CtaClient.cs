@@ -4,7 +4,7 @@ using CtaClient.Models;
 
 namespace CtaClient;
 
-public class CtaClient(HttpClient httpClient, CtaEndpointFactory endpointFactory, ILogger<CtaClient> logger): ICtaClient
+internal class CtaClient(HttpClient httpClient, CtaEndpointFactory endpointFactory, ILogger<CtaClient> logger): ICtaClient
 {
     /// <inheritdoc />
     public async Task<ArrivalsResponse> GetArrivals(ArrivalsRequest request)

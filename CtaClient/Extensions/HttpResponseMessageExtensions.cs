@@ -7,7 +7,7 @@ using CtaClient.Models;
 
 namespace CtaClient.Extensions;
 
-public static class HttpResponseMessageExtensions
+internal static class HttpResponseMessageExtensions
 {
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
@@ -28,7 +28,7 @@ public static class HttpResponseMessageExtensions
     /// </summary>
     /// <param name="response">The Http response message to validate</param>
     /// <returns>The validated ArrivalsResponse deserialized from the message response</returns>
-    public static async Task<ArrivalsResponse> EnsureCtaApiSuccess(this HttpResponseMessage response)
+    internal static async Task<ArrivalsResponse> EnsureCtaApiSuccess(this HttpResponseMessage response)
     {
         // Ensure we have a successul response code, or throw a service exception
         if (!response.IsSuccessStatusCode)
