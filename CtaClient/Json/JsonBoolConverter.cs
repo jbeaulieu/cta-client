@@ -10,7 +10,7 @@ namespace CtaClient.Json;
 ///   Write operations use the default behavior. Read operations use the <see cref="TryParseString" /> helper method
 ///     for strings, to handle the CTA's unique way of conveying bool values.
 /// </remarks>
-internal class JsonBoolConverter : JsonConverter<bool>
+public class JsonBoolConverter : JsonConverter<bool>
 {
     public override bool Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options) =>
     reader.TokenType switch

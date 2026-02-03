@@ -62,7 +62,7 @@ public class CtaEndpointFactoryTests
 
         var result = factory.GetArrvialsEndpoint(request);
 
-        var expected = $"{baseExpectedResponse}&mapid={mapId}&rt={route.ToServiceId()}&max={maxResults}";
+        var expected = $"{baseExpectedResponse}&mapid={mapId}&rt={route.GetServiceId()}&max={maxResults}";
 
         Assert.Equal(expected, result.ToString());
     }
@@ -79,7 +79,7 @@ public class CtaEndpointFactoryTests
 
         var result = factory.GetArrvialsEndpoint(request);
 
-        var expected = $"{baseExpectedResponse}&stpid={stopId}&rt={route.ToServiceId()}&max={maxResults}";
+        var expected = $"{baseExpectedResponse}&stpid={stopId}&rt={route.GetServiceId()}&max={maxResults}";
 
         Assert.Equal(expected, result.ToString());
     }
@@ -111,7 +111,7 @@ public class CtaEndpointFactoryTests
 
         var result = factory.GetArrvialsEndpoint(request);
 
-        var expected = $"{baseExpectedResponse}&mapid={mapId}&rt={route.ToServiceId()}";
+        var expected = $"{baseExpectedResponse}&mapid={mapId}&rt={route.GetServiceId()}";
 
         Assert.Equal(expected, result.ToString());
     }

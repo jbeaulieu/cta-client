@@ -36,7 +36,7 @@ public class CtaEndpointFactory
 
         if (request.MapId != null) endpoint += $"&mapid={request.MapId}";
         if (request.StopId != null) endpoint += $"&stpid={request.StopId}";
-        if (request.Route != null) endpoint += $"&rt={((Route)request.Route).ToServiceId()}";
+        if (request.Route != null) endpoint += $"&rt={((Route)request.Route).GetServiceId()}";
         if (request.MaxResults != null) endpoint += $"&max={request.MaxResults}";
 
         return new Uri(endpoint, UriKind.Absolute);
