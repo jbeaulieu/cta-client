@@ -18,7 +18,7 @@ public static class Program
             .Build();
 
         var services = CreateServices(configuration);
-        CtaClient client = services.GetRequiredService<CtaClient>();
+        ICtaClient client = services.GetRequiredService<ICtaClient>();
 
         var jsonOptions = new JsonSerializerOptions { WriteIndented = true };
 

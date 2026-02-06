@@ -10,7 +10,7 @@ namespace CtaClient.Json;
 ///   Write operations use the default behavior. Read operations use the <see cref="TryParseString" /> helper method
 ///     for strings, to handle the CTA's unique way of conveying bool values.
 /// </remarks>
-public class JsonBoolConverter : JsonConverter<bool>
+internal class JsonBoolConverter : JsonConverter<bool>
 {
     public override bool Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options) =>
     reader.TokenType switch
@@ -31,7 +31,7 @@ public class JsonBoolConverter : JsonConverter<bool>
     ///   Helper for reading stringified boolean values. The CTA API returns booleans as "0" and "1", i.e. an int cast as a string.
     ///     This handler will parse those values, as well as the more conventional "true" and "false" JSON strings.
     /// </summary>
-    public static bool TryParseString(Utf8JsonReader reader)
+    internal static bool TryParseString(Utf8JsonReader reader)
     {
         if (bool.TryParse(reader.GetString(), out var b)) return b;
 

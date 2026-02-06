@@ -9,7 +9,7 @@ internal class CtaEndpointFactory
     private string BaseAddress { get; set; }
     private string ApiKey { get; set; }
 
-    internal CtaEndpointFactory(IOptions<CtaApiSettings> apiSettings)
+    public CtaEndpointFactory(IOptions<CtaApiSettings> apiSettings)
     {
         if (string.IsNullOrWhiteSpace(apiSettings.Value.BaseAddress) ||
             string.IsNullOrWhiteSpace(apiSettings.Value.ApiKey))
