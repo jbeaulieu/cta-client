@@ -28,14 +28,13 @@ internal static class HttpResponseMessageExtensions
     /// </summary>
     /// <param name="response">The Http response message to validate</param>
     /// <returns>The validated ArrivalsResponse deserialized from the message response</returns>
-    internal static async Task<ArrivalsResponse> EnsureCtaApiSuccess(this HttpResponseMessage response)
+    internal static async Task<ArrivalsResponse> HandleCtaApiResponse(this HttpResponseMessage response)
     {
         // Ensure we have a successul response code, or throw a service exception
         if (!response.IsSuccessStatusCode)
         {
             switch (response.StatusCode)
             {
-
                 case HttpStatusCode.NotFound:
                     throw new NotFoundException(response.StatusCode);
                 case HttpStatusCode.RequestTimeout:
@@ -83,6 +82,6 @@ internal static class HttpResponseMessageExtensions
                 throw new ServerErrorException(result.Response.ErrorDescription);
             default:
                 throw new CtaException(result.Response.ErrorCode, result.Response.ErrorDescription);
-        };
+        }
     }
 }

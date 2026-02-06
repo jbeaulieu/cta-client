@@ -15,7 +15,7 @@ internal class CtaClient(HttpClient httpClient, CtaEndpointFactory endpointFacto
 
         var response = await SendAsync(uri);
 
-        return await response.EnsureCtaApiSuccess();
+        return await response.HandleCtaApiResponse();
     }
 
     private async Task<HttpResponseMessage> SendAsync(Uri requestUri)
