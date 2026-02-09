@@ -1,5 +1,6 @@
 using CtaClient.Config;
 using CtaClient.Models;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Options;
 
 namespace CtaClient;
@@ -32,12 +33,20 @@ internal class CtaEndpointFactory
             throw new ArgumentException("Exactly one of MapId or StopId should be specified");
         }
 
-        var endpoint = $"{BaseAddress}?key={ApiKey}&outputType=JSON";
+        // Required query params
+        var baseQueryParams = new Dictionary<string, string?>{{"key", ApiKey}, {"outputType", "JSON"}};
 
-        if (request.MapId != null) endpoint += $"&mapid={request.MapId}";
-        if (request.StopId != null) endpoint += $"&stpid={request.StopId}";
-        if (request.Route != null) endpoint += $"&rt={((Route)request.Route).GetServiceId()}";
-        if (request.MaxResults != null) endpoint += $"&max={request.MaxResults}";
+        var endpoint = QueryHelpers.AddQueryString(BaseAddress, baseQueryParams);
+
+        // Optional request params
+        var requestParams = new Dictionary<string, string?>();
+
+        if (request.MapId != null) requestParams.Add("mapid", request.MapId.ToString());
+        if (request.StopId != null) requestParams.Add("stpid", request.StopId.ToString());
+        if (request.Route != null) requestParams.Add("rt", ((Route)request.Route).GetServiceId());
+        if (request.MaxResults != null) requestParams.Add("max", request.MaxResults.ToString());
+
+        endpoint = QueryHelpers.AddQueryString(endpoint, requestParams);
 
         return new Uri(endpoint, UriKind.Absolute);
     }
