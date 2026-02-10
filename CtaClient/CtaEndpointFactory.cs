@@ -41,9 +41,9 @@ internal class CtaEndpointFactory
         // Optional request params
         var requestParams = new Dictionary<string, string?>();
 
-        if (request.MapId != null) requestParams.Add("mapid", request.MapId.ToString());
-        if (request.StopId != null) requestParams.Add("stpid", request.StopId.ToString());
-        if (request.Route != null) requestParams.Add("rt", ((Route)request.Route).GetServiceId());
+        if (request.MapIds != null) requestParams.Add("mapid", request.MapIds.ToString());
+        if (request.StopIds != null) requestParams.Add("stpid", request.StopIds.ToString());
+        if (request.Routes != null) requestParams.Add("rt", ((Route)request.Routes).GetServiceId());
         if (request.MaxResults != null) requestParams.Add("max", request.MaxResults.ToString());
 
         endpoint = QueryHelpers.AddQueryString(endpoint, requestParams);

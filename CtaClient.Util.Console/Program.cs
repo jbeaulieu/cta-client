@@ -24,7 +24,7 @@ public static class Program
 
         var request = new ArrivalsRequest
         {
-            MapId = 41320,
+            MapIds = [41320],
             MaxResults = 2
         };
 

@@ -55,8 +55,8 @@ public class CtaEndpointFactoryTests
     {
         var request = new ArrivalsRequest
         {
-            MapId = mapId,
-            Route = route,
+            MapIds = mapId,
+            Routes = route,
             MaxResults = maxResults
         };
 
@@ -72,8 +72,8 @@ public class CtaEndpointFactoryTests
     {
         var request = new ArrivalsRequest
         {
-            StopId = stopId,
-            Route = route,
+            StopIds = stopId,
+            Routes = route,
             MaxResults = maxResults
         };
 
@@ -89,7 +89,7 @@ public class CtaEndpointFactoryTests
     {
         var request = new ArrivalsRequest
         {
-            MapId = mapId,
+            MapIds = mapId,
             MaxResults = maxResults
         };
 
@@ -105,8 +105,8 @@ public class CtaEndpointFactoryTests
     {
         var request = new ArrivalsRequest
         {
-            MapId = mapId,
-            Route = route
+            MapIds = mapId,
+            Routes = route
         };
 
         var result = factory.GetArrvialsEndpoint(request);
@@ -121,7 +121,7 @@ public class CtaEndpointFactoryTests
     {
         var request = new ArrivalsRequest
         {
-            Route = route,
+            Routes = route,
             MaxResults = maxResults
         };
 
@@ -133,9 +133,9 @@ public class CtaEndpointFactoryTests
     {
         var request = new ArrivalsRequest
         {
-            MapId = mapId,
-            StopId = stopId,
-            Route = route,
+            MapIds = mapId,
+            StopIds = stopId,
+            Routes = route,
             MaxResults = maxResults
         };
 
