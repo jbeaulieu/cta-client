@@ -8,27 +8,27 @@ namespace CtaClient.Models;
 public class ArrivalsRequest
 {
     /// <summary>
-    ///   Numeric station identifier. Required if StopId is not specified
+    ///   Numeric station identifiers. Required if StopIds is not specified
     /// </summary>
     [JsonPropertyName("mapid")]
-    public int? MapId { get; set; }
+    public List<int>? MapIds { get; set; }
 
     /// <summary>
-    ///   Numeric stop identifier. Required if MapId is not specified
+    ///   Numeric stop identifiers. Required if MapIds is not specified.
     /// </summary>
     [JsonPropertyName("stpid")]
-    public int? StopId { get; set; }
+    public List<int>? StopIds { get; set; }
 
     /// <summary>
     ///   Optional. Allows for filtering by individual routes. If unset, all routes for the requested stop
     ///     or station will be returned.
     /// </summary>
     [JsonPropertyName("rt")]
-    public Route? Route { get; set; }
+    public List<Route>? Routes { get; set; }
 
     /// <summary>
-    ///   Optional. Allows for specifying the maximum number of results to retrieve. If unset, all available
-    ///     results for the requested stop or station will be returned.
+    ///   Optional. Used to specify the maximum number of results to retrieve, sorted by predicted arrival time.
+    ///     If unset, all available results for the requested stop or station will be returned.
     /// </summary>
     [JsonPropertyName("max")]
     public int? MaxResults { get; set; }

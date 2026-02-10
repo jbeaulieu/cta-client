@@ -1,4 +1,5 @@
 using CtaClient.Config;
+using CtaClient.Exceptions;
 using CtaClient.Models;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Options;
@@ -27,10 +28,10 @@ internal class CtaEndpointFactory
     /// </summary>
     internal Uri GetArrvialsEndpoint(ArrivalsRequest request)
     {
-        // Validation: Exactly one of request.MapId and request.StopId should be populated.
-        if ((request.MapId != null && request.StopId != null) || (request.MapId == null && request.StopId == null))
+        // Validation: At least one of request.MapId and request.StopId should be populated.
+        if (IsNullOrEmpty(request.MapIds) && IsNullOrEmpty(request.StopIds))
         {
-            throw new ArgumentException("Exactly one of MapId or StopId should be specified");
+            throw new MissingParameterException("MapId or StopId must be specified");
         }
 
         // Required query params
@@ -39,15 +40,35 @@ internal class CtaEndpointFactory
         var endpoint = QueryHelpers.AddQueryString(BaseAddress, baseQueryParams);
 
         // Optional request params
-        var requestParams = new Dictionary<string, string?>();
+        var requestParams = new List<KeyValuePair<string, string?>>();
 
-        if (request.MapId != null) requestParams.Add("mapid", request.MapId.ToString());
-        if (request.StopId != null) requestParams.Add("stpid", request.StopId.ToString());
-        if (request.Route != null) requestParams.Add("rt", ((Route)request.Route).GetServiceId());
-        if (request.MaxResults != null) requestParams.Add("max", request.MaxResults.ToString());
+        foreach (var mapId in request.MapIds ?? [])
+        {
+            requestParams.Add(new KeyValuePair<string, string?>("mapid", mapId.ToString()));
+        }
+
+        foreach (var stopId in request.StopIds ?? [])
+        {
+            requestParams.Add(new KeyValuePair<string, string?>("stpid", stopId.ToString()));
+        }
+
+        foreach (var route in request.Routes ?? [])
+        {
+            requestParams.Add(new KeyValuePair<string, string?>("rt", route.GetServiceId()));
+        }
+
+        if (request.MaxResults != null)
+        {
+            requestParams.Add(new KeyValuePair<string, string?>("max", request.MaxResults.ToString()));
+        }
 
         endpoint = QueryHelpers.AddQueryString(endpoint, requestParams);
 
         return new Uri(endpoint, UriKind.Absolute);
     }
+
+    /// <summary>
+    ///   Validates that a list is not null and has at least one element.
+    /// </summary>
+    private static bool IsNullOrEmpty(List<int>? list) => list == null || list.Count == 0;
 }
