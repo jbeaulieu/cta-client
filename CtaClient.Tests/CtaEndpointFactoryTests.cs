@@ -15,7 +15,7 @@ public class CtaEndpointFactoryTests
     private const int STOP_ID_2 = 09876;
     private const Route ROUTE_1 = Route.Purple;
     private const Route ROUTE_2 = Route.Red;
-    private const int maxResults = 8;
+    private const int MAX_RESULTS = 8;
     private readonly string baseExpectedResponse;
     private readonly CtaEndpointFactory factory;
 
@@ -66,7 +66,7 @@ public class CtaEndpointFactoryTests
         var request = new ArrivalsRequest
         {
             Routes = [ROUTE_1],
-            MaxResults = maxResults
+            MaxResults = MAX_RESULTS
         };
 
         Assert.Throws<MissingParameterException>(() => factory.GetArrvialsEndpoint(request));
@@ -78,12 +78,12 @@ public class CtaEndpointFactoryTests
         var request = new ArrivalsRequest
         {
             MapIds = [MAP_ID_1],
-            MaxResults = maxResults
+            MaxResults = MAX_RESULTS
         };
 
         var result = factory.GetArrvialsEndpoint(request);
 
-        var expected = $"{baseExpectedResponse}&mapid={MAP_ID_1}&max={maxResults}";
+        var expected = $"{baseExpectedResponse}&mapid={MAP_ID_1}&max={MAX_RESULTS}";
 
         Assert.Equal(expected, result.ToString());
     }
@@ -94,12 +94,12 @@ public class CtaEndpointFactoryTests
         var request = new ArrivalsRequest
         {
             MapIds = [MAP_ID_1, MAP_ID_2],
-            MaxResults = maxResults
+            MaxResults = MAX_RESULTS
         };
 
         var result = factory.GetArrvialsEndpoint(request);
 
-        var expected = $"{baseExpectedResponse}&mapid={MAP_ID_1}&mapid={MAP_ID_2}&max={maxResults}";
+        var expected = $"{baseExpectedResponse}&mapid={MAP_ID_1}&mapid={MAP_ID_2}&max={MAX_RESULTS}";
 
         Assert.Equal(expected, result.ToString());
     }
@@ -110,7 +110,7 @@ public class CtaEndpointFactoryTests
         var request = new ArrivalsRequest
         {
             StopIds = [STOP_ID_1],
-            MaxResults = maxResults
+            MaxResults = MAX_RESULTS
         };
 
         var result = factory.GetArrvialsEndpoint(request);
@@ -124,12 +124,12 @@ public class CtaEndpointFactoryTests
         var request = new ArrivalsRequest
         {
             StopIds = [STOP_ID_1],
-            MaxResults = maxResults
+            MaxResults = MAX_RESULTS
         };
 
         var result = factory.GetArrvialsEndpoint(request);
 
-        var expected = $"{baseExpectedResponse}&stpid={STOP_ID_1}&max={maxResults}";
+        var expected = $"{baseExpectedResponse}&stpid={STOP_ID_1}&max={MAX_RESULTS}";
 
         Assert.Equal(expected, result.ToString());
     }
@@ -140,12 +140,12 @@ public class CtaEndpointFactoryTests
         var request = new ArrivalsRequest
         {
             StopIds = [STOP_ID_1, STOP_ID_2],
-            MaxResults = maxResults
+            MaxResults = MAX_RESULTS
         };
 
         var result = factory.GetArrvialsEndpoint(request);
 
-        var expected = $"{baseExpectedResponse}&stpid={STOP_ID_1}&stpid={STOP_ID_2}&max={maxResults}";
+        var expected = $"{baseExpectedResponse}&stpid={STOP_ID_1}&stpid={STOP_ID_2}&max={MAX_RESULTS}";
 
         Assert.Equal(expected, result.ToString());
     }
@@ -156,7 +156,7 @@ public class CtaEndpointFactoryTests
         var request = new ArrivalsRequest
         {
             MapIds = [MAP_ID_1],
-            MaxResults = maxResults
+            MaxResults = MAX_RESULTS
         };
 
         var result = factory.GetArrvialsEndpoint(request);
@@ -203,7 +203,7 @@ public class CtaEndpointFactoryTests
         {
             MapIds = [MAP_ID_1],
             StopIds = [STOP_ID_2],
-            MaxResults = maxResults
+            MaxResults = MAX_RESULTS
         };
 
         var result = factory.GetArrvialsEndpoint(request);
@@ -218,12 +218,12 @@ public class CtaEndpointFactoryTests
         {
             MapIds = [MAP_ID_2],
             StopIds = [STOP_ID_1],
-            MaxResults = maxResults
+            MaxResults = MAX_RESULTS
         };
 
         var result = factory.GetArrvialsEndpoint(request);
 
-        var expected = $"{baseExpectedResponse}&mapid={MAP_ID_2}&stpid={STOP_ID_1}&max={maxResults}";
+        var expected = $"{baseExpectedResponse}&mapid={MAP_ID_2}&stpid={STOP_ID_1}&max={MAX_RESULTS}";
 
         Assert.Equal(expected, result.ToString());
     }
