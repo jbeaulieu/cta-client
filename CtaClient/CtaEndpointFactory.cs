@@ -1,4 +1,5 @@
 using CtaClient.Config;
+using CtaClient.Exceptions;
 using CtaClient.Models;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Options;
@@ -27,10 +28,10 @@ internal class CtaEndpointFactory
     /// </summary>
     internal Uri GetArrvialsEndpoint(ArrivalsRequest request)
     {
-        // Validation: Exactly one of request.MapId and request.StopId should be populated.
-        if ((request.MapId != null && request.StopId != null) || (request.MapId == null && request.StopId == null))
+        // Validation: At least one of request.MapId and request.StopId should be populated.
+        if (IsNullOrEmpty(request.MapIds) && IsNullOrEmpty(request.StopIds))
         {
-            throw new ArgumentException("Exactly one of MapId or StopId should be specified");
+            throw new MissingParameterException("MapId or StopId must be specified");
         }
 
         // Required query params
@@ -50,4 +51,9 @@ internal class CtaEndpointFactory
 
         return new Uri(endpoint, UriKind.Absolute);
     }
+
+    /// <summary>
+    ///   Validates that a list is not null and has at least one element.
+    /// </summary>
+    private static bool IsNullOrEmpty(List<int>? list) => list == null || list.Count == 0;
 }
