@@ -57,7 +57,7 @@ public class CtaClientTests
 
         var request = new ArrivalsRequest
         {
-            MapId = 12345,
+            MapIds = [12345],
         };
 
         var client = CreateCtaClient(httpMessageHandler);
