@@ -1,6 +1,6 @@
 # yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
 
-name: Test
+name: Build
 on:
   workflow_dispatch: # Allow running the workflow manually from the GitHub UI
   push:
@@ -29,8 +29,12 @@ jobs:
       uses: actions/setup-dotnet@v5
       with:
         dotnet-version: '10.0.x'
-    - name: Run tests
-      run: dotnet test
+    - name: Restore
+      run: dotnet restore
+    - name: Build
+      run: dotnet build --no-restore
+    - name: Test
+      run: dotnet test --no-build --verbosity normal
 
   sonar_scan:
     name: Quality Gate
@@ -72,7 +76,7 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         shell: powershell
         run: |
-          ${{ runner.temp }}\scanner\dotnet-sonarscanner begin /k:"jbeaulieu_cta-client" /o:"jbeaulieu" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.cs.opencover.reportsPaths=coverage.xml
+          ${{ runner.temp }}\scanner\dotnet-sonarscanner begin /k:"jbeaulieu_cta-client" /o:"jbeaulieu" /d:sonar.token="$SONAR_TOKEN" /d:sonar.cs.opencover.reportsPaths=coverage.xml
           dotnet build --no-incremental
           coverlet .\CtaClient.Tests\bin\Debug\net10.0\CtaClient.Tests.dll --target "dotnet" --targetargs "test --no-build" -f=opencover -o="coverage.xml"
-          ${{ runner.temp }}\scanner\dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
+          ${{ runner.temp }}\scanner\dotnet-sonarscanner end /d:sonar.token="$SONAR_TOKEN"
