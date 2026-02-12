@@ -24,13 +24,13 @@ public class Arrival
     ///   Proper name of the parent station
     /// </summary>
     [JsonPropertyName("staNm")]
-    public string StationName { get; set; }
+    public string StationName { get; set; } = "";
 
     /// <summary>
     ///   Description of the platform for this prediction
     /// </summary>
     [JsonPropertyName("stpDe")]
-    public string StopDescription { get; set; }
+    public string StopDescription { get; set; } = "";
 
     /// <summary>
     ///   Run number of the train in this arrival prediction
@@ -54,7 +54,7 @@ public class Arrival
     ///   Destination description
     /// </summary>
     [JsonPropertyName("destNm")]
-    public string DestinationName { get; set; }
+    public string DestinationName { get; set; } = "";
 
     /// <summary>
     ///   Operational direction of the train, roughly corresponding to Northbound=1 and Southbound=5. See the
@@ -64,13 +64,13 @@ public class Arrival
     public int DirectionCode { get; set; }
 
     /// <summary>
-    ///   
+    ///   Timestamp for when this arrival prediction was generated
     /// </summary>
     [JsonPropertyName("prdt")]
     public DateTimeOffset Timestamp { get; set; }
 
     /// <summary>
-    ///   
+    ///   Timestamp for when this train is expected to arrive
     /// </summary>
     [JsonPropertyName("arrT")]
     public DateTimeOffset ArrivalTime { get; set; }
@@ -107,21 +107,21 @@ public class Arrival
     public string? Flags { get; set; } = null;
 
     /// <summary>
-    ///   Latitude position of the train in decimal degrees
+    ///   The current latitude position of this train, in decimal degrees
     /// </summary>
     [JsonPropertyName("lat")]
-    public float Latitude { get; set; }
+    public float? Latitude { get; set; }
 
     /// <summary>
-    ///   Longitude position of the train in decimal degrees
+    ///   The current longitude position of this train, in decimal degrees
     /// </summary>
     [JsonPropertyName("lon")]
-    public float Longitude { get; set; }
+    public float? Longitude { get; set; }
 
     /// <summary>
-    ///   Heading, expressed in standard bearing degrees
+    ///   The current heading of this train, expressed in standard bearing degrees
     ///     (0 = North, 90 = East, 180 = South, and 270 = West. Range is 0 to 359, progressing clockwise)
     /// </summary>
     [JsonPropertyName("heading")]
-    public int Heading { get; set; }
+    public int? Heading { get; set; }
 }
