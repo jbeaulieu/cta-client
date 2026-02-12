@@ -114,10 +114,10 @@ public class JsonConverterTests
         // The CTA only provides 5 decimal places of lat/lon data, so we use Math.Round here to
         // only check those digits for equality
         Assert.IsType<float>(result.Latitude);
-        Assert.Equal(Math.Round(41.94775, 5), Math.Round(result.Latitude, 5));
+        Assert.Equal(Math.Round(41.94775, 5), Math.Round((double)result.Latitude, 5));
 
         Assert.IsType<float>(result.Longitude);
-        Assert.Equal(Math.Round(-87.65363, 5), Math.Round(result.Longitude, 5));
+        Assert.Equal(Math.Round(-87.65363, 5), Math.Round((double)result.Longitude, 5));
 
         Assert.IsType<int>(result.Heading);
         Assert.Equal(179, result.Heading);
