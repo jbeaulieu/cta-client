@@ -10,6 +10,7 @@ internal class CtaEndpointFactory
 {
     private string BaseAddress { get; set; }
     private string ApiKey { get; set; }
+    private const string CTA_ARRIVALS_PATH = "/ttarrivals.aspx";
 
     public CtaEndpointFactory(IOptions<CtaApiSettings> apiSettings)
     {
@@ -34,14 +35,15 @@ internal class CtaEndpointFactory
             throw new MissingParameterException("MapId or StopId must be specified");
         }
 
-        // Required query params
-        var baseQueryParams = new Dictionary<string, string?>{{"key", ApiKey}, {"outputType", "JSON"}};
+        var builder = new UriBuilder(BaseAddress);
+        builder.Path += CTA_ARRIVALS_PATH;
 
-        var endpoint = QueryHelpers.AddQueryString(BaseAddress, baseQueryParams);
-
-        // Optional request params
         var requestParams = new List<KeyValuePair<string, string?>>();
 
+        // Required query params
+        requestParams.AddRange([new("key", ApiKey), new("outputType", "JSON")]);
+
+        // Optional request params
         foreach (var mapId in request.MapIds ?? [])
         {
             requestParams.Add(new KeyValuePair<string, string?>("mapid", mapId.ToString()));
@@ -62,7 +64,7 @@ internal class CtaEndpointFactory
             requestParams.Add(new KeyValuePair<string, string?>("max", request.MaxResults.ToString()));
         }
 
-        endpoint = QueryHelpers.AddQueryString(endpoint, requestParams);
+        var endpoint = QueryHelpers.AddQueryString(builder.ToString(), requestParams);
 
         return new Uri(endpoint, UriKind.Absolute);
     }

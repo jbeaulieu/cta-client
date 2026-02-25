@@ -22,7 +22,7 @@ public class CtaClientTests
         var fakeApiSettings = new OptionsWrapper<CtaApiSettings>(new CtaApiSettings
         {
             ApiKey = "fakeKey",
-            BaseAddress = "https://lapi/bogus.net",
+            BaseAddress = "https://lapi.bogus/api/1.0",
         });
 
         mockEndpointFactory = new Mock<CtaEndpointFactory>(fakeApiSettings);

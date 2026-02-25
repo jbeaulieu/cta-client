@@ -8,7 +8,8 @@ namespace CtaClient.Tests;
 public class CtaEndpointFactoryTests
 {
     private const string MOCK_API_KEY = "fakeKey";
-    private const string MOCK_BASE_ADDR = "https://lapi/bogus.net";
+    private const string MOCK_BASE_ADDR = "https://lapi.bogus/api/1.0";
+    private const string CTA_ARRIVALS_PATH = "/ttarrivals.aspx";
     private const int MAP_ID_1 = 12345;
     private const int MAP_ID_2 = 54321;
     private const int STOP_ID_1 = 67890;
@@ -29,7 +30,7 @@ public class CtaEndpointFactoryTests
 
         factory = new CtaEndpointFactory(mockApiSettings);
 
-        baseExpectedResponse = $"{MOCK_BASE_ADDR}?key={MOCK_API_KEY}&outputType=JSON";
+        baseExpectedResponse = $"{MOCK_BASE_ADDR}{CTA_ARRIVALS_PATH}?key={MOCK_API_KEY}&outputType=JSON";
     }
 
     #region Constructor Tests

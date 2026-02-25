@@ -11,7 +11,7 @@ public class CtaClientExtensionsTests
     {
         var inMemorySettings = new Dictionary<string, string?> {
             {"CtaApiSettings:ApiKey", "fakeKey"},
-            {"CtaApiSettings:BaseAddress", "https://lapi/bogus.net"},
+            {"CtaApiSettings:BaseAddress", "https://lapi.bogus/api/1.0"},
         };
 
         IConfiguration configuration = new ConfigurationBuilder()
