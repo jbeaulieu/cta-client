@@ -10,14 +10,17 @@ public class CtaEndpointFactoryTests
     private const string MOCK_API_KEY = "fakeKey";
     private const string MOCK_BASE_ADDR = "https://lapi.bogus/api/1.0";
     private const string CTA_ARRIVALS_PATH = "/ttarrivals.aspx";
+    private const string CTA_FOLLOW_TRAIN_PATH = "/ttfollow.aspx";
     private const int MAP_ID_1 = 12345;
     private const int MAP_ID_2 = 54321;
     private const int STOP_ID_1 = 67890;
     private const int STOP_ID_2 = 09876;
     private const Route ROUTE_1 = Route.Purple;
     private const Route ROUTE_2 = Route.Red;
+    private const int RUN_NUMBER = 801;
     private const int MAX_RESULTS = 8;
-    private readonly string baseExpectedResponse;
+    private readonly string baseArrivalsExpectedResponse;
+    private readonly string baseFollowTrainExpectedResponse;
     private readonly CtaEndpointFactory factory;
 
     public CtaEndpointFactoryTests()
@@ -30,7 +33,8 @@ public class CtaEndpointFactoryTests
 
         factory = new CtaEndpointFactory(mockApiSettings);
 
-        baseExpectedResponse = $"{MOCK_BASE_ADDR}{CTA_ARRIVALS_PATH}?key={MOCK_API_KEY}&outputType=JSON";
+        baseArrivalsExpectedResponse = $"{MOCK_BASE_ADDR}{CTA_ARRIVALS_PATH}?key={MOCK_API_KEY}&outputType=JSON";
+        baseFollowTrainExpectedResponse = $"{MOCK_BASE_ADDR}{CTA_FOLLOW_TRAIN_PATH}?key={MOCK_API_KEY}&outputType=JSON";
     }
 
     #region Constructor Tests
@@ -59,7 +63,7 @@ public class CtaEndpointFactoryTests
 
     #endregion
 
-    #region GetArrivalsEndpoint Tests
+    #region Arrivals Endpoint Tests
 
     [Fact]
     public void CtaEndpointFactory_GetArrivals_MissingStopIdAndMapId_Throws()
@@ -84,7 +88,7 @@ public class CtaEndpointFactoryTests
 
         var result = factory.GetArrvialsEndpoint(request);
 
-        var expected = $"{baseExpectedResponse}&mapid={MAP_ID_1}&max={MAX_RESULTS}";
+        var expected = $"{baseArrivalsExpectedResponse}&mapid={MAP_ID_1}&max={MAX_RESULTS}";
 
         Assert.Equal(expected, result.ToString());
     }
@@ -100,7 +104,7 @@ public class CtaEndpointFactoryTests
 
         var result = factory.GetArrvialsEndpoint(request);
 
-        var expected = $"{baseExpectedResponse}&mapid={MAP_ID_1}&mapid={MAP_ID_2}&max={MAX_RESULTS}";
+        var expected = $"{baseArrivalsExpectedResponse}&mapid={MAP_ID_1}&mapid={MAP_ID_2}&max={MAX_RESULTS}";
 
         Assert.Equal(expected, result.ToString());
     }
@@ -130,7 +134,7 @@ public class CtaEndpointFactoryTests
 
         var result = factory.GetArrvialsEndpoint(request);
 
-        var expected = $"{baseExpectedResponse}&stpid={STOP_ID_1}&max={MAX_RESULTS}";
+        var expected = $"{baseArrivalsExpectedResponse}&stpid={STOP_ID_1}&max={MAX_RESULTS}";
 
         Assert.Equal(expected, result.ToString());
     }
@@ -146,7 +150,7 @@ public class CtaEndpointFactoryTests
 
         var result = factory.GetArrvialsEndpoint(request);
 
-        var expected = $"{baseExpectedResponse}&stpid={STOP_ID_1}&stpid={STOP_ID_2}&max={MAX_RESULTS}";
+        var expected = $"{baseArrivalsExpectedResponse}&stpid={STOP_ID_1}&stpid={STOP_ID_2}&max={MAX_RESULTS}";
 
         Assert.Equal(expected, result.ToString());
     }
@@ -176,7 +180,7 @@ public class CtaEndpointFactoryTests
 
         var result = factory.GetArrvialsEndpoint(request);
 
-        var expected = $"{baseExpectedResponse}&mapid={MAP_ID_1}&rt={ROUTE_1.GetServiceId()}";
+        var expected = $"{baseArrivalsExpectedResponse}&mapid={MAP_ID_1}&rt={ROUTE_1.GetServiceId()}";
 
         Assert.Equal(expected, result.ToString());
     }
@@ -192,7 +196,7 @@ public class CtaEndpointFactoryTests
 
         var result = factory.GetArrvialsEndpoint(request);
 
-        var expected = $"{baseExpectedResponse}&mapid={MAP_ID_1}&rt={ROUTE_1.GetServiceId()}&rt={ROUTE_2.GetServiceId()}";
+        var expected = $"{baseArrivalsExpectedResponse}&mapid={MAP_ID_1}&rt={ROUTE_1.GetServiceId()}&rt={ROUTE_2.GetServiceId()}";
 
         Assert.Equal(expected, result.ToString());
     }
@@ -224,7 +228,7 @@ public class CtaEndpointFactoryTests
 
         var result = factory.GetArrvialsEndpoint(request);
 
-        var expected = $"{baseExpectedResponse}&mapid={MAP_ID_2}&stpid={STOP_ID_1}&max={MAX_RESULTS}";
+        var expected = $"{baseArrivalsExpectedResponse}&mapid={MAP_ID_2}&stpid={STOP_ID_1}&max={MAX_RESULTS}";
 
         Assert.Equal(expected, result.ToString());
     }
@@ -240,6 +244,33 @@ public class CtaEndpointFactoryTests
         var result = factory.GetArrvialsEndpoint(request);
 
         Assert.DoesNotContain("max", result.ToString());
+    }
+
+    #endregion
+
+    #region FollowThisTrain Endpoint Tests
+
+    [Fact]
+    public void CtaEndpointFactory_FollowThisTrain_MissingRunNumber_Throws()
+    {
+        var request = new FollowTrainRequest();
+
+        Assert.Throws<MissingParameterException>(() => factory.GetFollowThisTrainEndpoint(request));
+    }
+
+    [Fact]
+    public void CtaEndpointFactory_FollowThisTrain_AddsRunNumber()
+    {
+        var request = new FollowTrainRequest
+        {
+            RunNumber = RUN_NUMBER
+        };
+
+        var result = factory.GetFollowThisTrainEndpoint(request);
+
+        var expected = $"{baseFollowTrainExpectedResponse}&runnumber={RUN_NUMBER}";
+
+        Assert.Equal(expected, result.ToString());
     }
 
     #endregion

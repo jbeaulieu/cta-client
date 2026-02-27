@@ -11,6 +11,7 @@ internal class CtaEndpointFactory
     private string BaseAddress { get; set; }
     private string ApiKey { get; set; }
     private const string CTA_ARRIVALS_PATH = "/ttarrivals.aspx";
+    private const string CTA_FOLLOW_TRAIN_PATH = "/ttfollow.aspx";
 
     public CtaEndpointFactory(IOptions<CtaApiSettings> apiSettings)
     {
@@ -63,6 +64,31 @@ internal class CtaEndpointFactory
         {
             requestParams.Add(new KeyValuePair<string, string?>("max", request.MaxResults.ToString()));
         }
+
+        var endpoint = QueryHelpers.AddQueryString(builder.ToString(), requestParams);
+
+        return new Uri(endpoint, UriKind.Absolute);
+    }
+
+    /// <summary>
+    ///   Validates and formats a uri request for the CTA Arrivals endpoint
+    /// </summary>
+    internal Uri GetFollowThisTrainEndpoint(FollowTrainRequest request)
+    {
+        // Validation: request.RunNumber must be a postive value.
+        if (request.RunNumber < 1)
+        {
+            throw new MissingParameterException("RunNumber must be a positive integer");
+        }
+
+        var builder = new UriBuilder(BaseAddress);
+        builder.Path += CTA_FOLLOW_TRAIN_PATH;
+
+        var requestParams = new List<KeyValuePair<string, string?>>(){
+            new("key", ApiKey),
+            new("outputType", "JSON"),
+            new("runnumber", request.RunNumber.ToString())
+        };
 
         var endpoint = QueryHelpers.AddQueryString(builder.ToString(), requestParams);
 
