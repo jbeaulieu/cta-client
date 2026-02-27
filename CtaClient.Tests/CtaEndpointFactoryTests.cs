@@ -74,7 +74,7 @@ public class CtaEndpointFactoryTests
             MaxResults = MAX_RESULTS
         };
 
-        Assert.Throws<MissingParameterException>(() => factory.GetArrvialsEndpoint(request));
+        Assert.Throws<MissingParameterException>(() => factory.GetArrivalsEndpoint(request));
     }
 
     [Fact]
@@ -86,7 +86,7 @@ public class CtaEndpointFactoryTests
             MaxResults = MAX_RESULTS
         };
 
-        var result = factory.GetArrvialsEndpoint(request);
+        var result = factory.GetArrivalsEndpoint(request);
 
         var expected = $"{baseArrivalsExpectedResponse}&mapid={MAP_ID_1}&max={MAX_RESULTS}";
 
@@ -102,7 +102,7 @@ public class CtaEndpointFactoryTests
             MaxResults = MAX_RESULTS
         };
 
-        var result = factory.GetArrvialsEndpoint(request);
+        var result = factory.GetArrivalsEndpoint(request);
 
         var expected = $"{baseArrivalsExpectedResponse}&mapid={MAP_ID_1}&mapid={MAP_ID_2}&max={MAX_RESULTS}";
 
@@ -118,7 +118,7 @@ public class CtaEndpointFactoryTests
             MaxResults = MAX_RESULTS
         };
 
-        var result = factory.GetArrvialsEndpoint(request);
+        var result = factory.GetArrivalsEndpoint(request);
 
         Assert.DoesNotContain("mapid", result.ToString());
     }
@@ -132,7 +132,7 @@ public class CtaEndpointFactoryTests
             MaxResults = MAX_RESULTS
         };
 
-        var result = factory.GetArrvialsEndpoint(request);
+        var result = factory.GetArrivalsEndpoint(request);
 
         var expected = $"{baseArrivalsExpectedResponse}&stpid={STOP_ID_1}&max={MAX_RESULTS}";
 
@@ -148,7 +148,7 @@ public class CtaEndpointFactoryTests
             MaxResults = MAX_RESULTS
         };
 
-        var result = factory.GetArrvialsEndpoint(request);
+        var result = factory.GetArrivalsEndpoint(request);
 
         var expected = $"{baseArrivalsExpectedResponse}&stpid={STOP_ID_1}&stpid={STOP_ID_2}&max={MAX_RESULTS}";
 
@@ -164,7 +164,7 @@ public class CtaEndpointFactoryTests
             MaxResults = MAX_RESULTS
         };
 
-        var result = factory.GetArrvialsEndpoint(request);
+        var result = factory.GetArrivalsEndpoint(request);
 
         Assert.DoesNotContain("stpid", result.ToString());
     }
@@ -178,7 +178,7 @@ public class CtaEndpointFactoryTests
             Routes = [ROUTE_1],
         };
 
-        var result = factory.GetArrvialsEndpoint(request);
+        var result = factory.GetArrivalsEndpoint(request);
 
         var expected = $"{baseArrivalsExpectedResponse}&mapid={MAP_ID_1}&rt={ROUTE_1.GetServiceId()}";
 
@@ -194,7 +194,7 @@ public class CtaEndpointFactoryTests
             Routes = [ROUTE_1, ROUTE_2],
         };
 
-        var result = factory.GetArrvialsEndpoint(request);
+        var result = factory.GetArrivalsEndpoint(request);
 
         var expected = $"{baseArrivalsExpectedResponse}&mapid={MAP_ID_1}&rt={ROUTE_1.GetServiceId()}&rt={ROUTE_2.GetServiceId()}";
 
@@ -211,7 +211,7 @@ public class CtaEndpointFactoryTests
             MaxResults = MAX_RESULTS
         };
 
-        var result = factory.GetArrvialsEndpoint(request);
+        var result = factory.GetArrivalsEndpoint(request);
 
         Assert.DoesNotContain("rt", result.ToString());
     }
@@ -226,7 +226,7 @@ public class CtaEndpointFactoryTests
             MaxResults = MAX_RESULTS
         };
 
-        var result = factory.GetArrvialsEndpoint(request);
+        var result = factory.GetArrivalsEndpoint(request);
 
         var expected = $"{baseArrivalsExpectedResponse}&mapid={MAP_ID_2}&stpid={STOP_ID_1}&max={MAX_RESULTS}";
 
@@ -241,7 +241,7 @@ public class CtaEndpointFactoryTests
             MapIds = [MAP_ID_1],
         };
 
-        var result = factory.GetArrvialsEndpoint(request);
+        var result = factory.GetArrivalsEndpoint(request);
 
         Assert.DoesNotContain("max", result.ToString());
     }

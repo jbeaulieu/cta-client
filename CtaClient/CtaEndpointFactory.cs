@@ -28,7 +28,7 @@ internal class CtaEndpointFactory
     /// <summary>
     ///   Validates and formats a uri request for the CTA Arrivals endpoint
     /// </summary>
-    internal Uri GetArrvialsEndpoint(ArrivalsRequest request)
+    internal Uri GetArrivalsEndpoint(ArrivalsRequest request)
     {
         // Validation: At least one of request.MapId and request.StopId should be populated.
         if (IsNullOrEmpty(request.MapIds) && IsNullOrEmpty(request.StopIds))

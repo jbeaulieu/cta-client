@@ -11,7 +11,7 @@ internal class CtaClient(HttpClient httpClient, CtaEndpointFactory endpointFacto
     {
         logger.LogInformation("[CtaClient] GetArrivals() called.");
 
-        var uri = endpointFactory.GetArrvialsEndpoint(request);
+        var uri = endpointFactory.GetArrivalsEndpoint(request);
 
         var response = await SendAsync(uri);
 
