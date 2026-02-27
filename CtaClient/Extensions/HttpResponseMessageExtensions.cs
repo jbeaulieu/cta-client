@@ -28,7 +28,7 @@ internal static class HttpResponseMessageExtensions
     /// </summary>
     /// <param name="response">The Http response message to validate</param>
     /// <returns>The validated ArrivalsResponse deserialized from the message response</returns>
-    internal static async Task<ArrivalsResponse> HandleCtaApiResponse(this HttpResponseMessage response)
+    internal static async Task<T> HandleCtaApiResponse<T>(this HttpResponseMessage response) where T : AbstractCtaResponse
     {
         // Ensure we have a successul response code, or throw a service exception
         if (!response.IsSuccessStatusCode)
@@ -51,7 +51,7 @@ internal static class HttpResponseMessageExtensions
 
         // Attempt to deserialize the response
         var responseContent = await response.Content.ReadAsStringAsync();
-        var result = JsonSerializer.Deserialize<CtaApiResult>(responseContent, JsonOptions) ??
+        var result = JsonSerializer.Deserialize<CtaApiResult<T>>(responseContent, JsonOptions) ??
             throw new JsonException($"Unable to deserialize payload: [{responseContent}]");
 
         // Extract any errors from the response. If there are none, return the deserialized object

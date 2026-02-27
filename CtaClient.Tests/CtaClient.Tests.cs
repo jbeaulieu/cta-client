@@ -14,7 +14,7 @@ public class CtaClientTests
 {
     private readonly Mock<ILogger<CtaClient>> mockLogger;
     private readonly Mock<CtaEndpointFactory> mockEndpointFactory;
-    private readonly CtaApiResult response;
+    private readonly CtaApiResult<ArrivalsResponse> response;
     public CtaClientTests()
     {
         mockLogger = new Mock<ILogger<CtaClient>>();
@@ -34,7 +34,7 @@ public class CtaClientTests
             Arrivals = [ new() { Route = Route.Red }],
         };
 
-        response = new CtaApiResult { Response = arrivalsResponse };
+        response = new CtaApiResult<ArrivalsResponse> { Response = arrivalsResponse };
     }
 
     private Mock<CtaClient> CreateCtaClient(Mock<HttpMessageHandler> httpMessageHandler)

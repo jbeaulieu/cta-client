@@ -12,7 +12,7 @@ namespace CtaClient.Tests.Extensions;
 
 public class HttpResponseMessageExtensionsTests
 {
-    private readonly CtaApiResult apiResult;
+    private readonly CtaApiResult<ArrivalsResponse> apiResult;
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
         DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
@@ -35,7 +35,7 @@ public class HttpResponseMessageExtensionsTests
             Arrivals = []
         };
 
-        apiResult = new CtaApiResult
+        apiResult = new CtaApiResult<ArrivalsResponse>
         {
             Response = arrivalsResponse
         };
@@ -49,7 +49,7 @@ public class HttpResponseMessageExtensionsTests
             Content = new StringContent(JsonSerializer.Serialize(apiResult, JsonOptions), Encoding.UTF8, MediaTypeNames.Application.Json)
         };
 
-        var result = await responseMessage.HandleCtaApiResponse();
+        var result = await responseMessage.HandleCtaApiResponse<ArrivalsResponse>();
 
         Assert.IsType<ArrivalsResponse>(result);
     }
@@ -66,7 +66,7 @@ public class HttpResponseMessageExtensionsTests
             Content = new StringContent(badJson, Encoding.UTF8, MediaTypeNames.Application.Json)
         };
 
-        await Assert.ThrowsAsync<JsonException>(() => responseMessage.HandleCtaApiResponse());
+        await Assert.ThrowsAsync<JsonException>(responseMessage.HandleCtaApiResponse<ArrivalsResponse>);
     }
 
     [Fact]
@@ -77,7 +77,7 @@ public class HttpResponseMessageExtensionsTests
             Content = new StringContent(JsonSerializer.Serialize(apiResult, JsonOptions), Encoding.UTF8, MediaTypeNames.Application.Json)
         };
 
-        await Assert.ThrowsAsync<NotFoundException>(responseMessage.HandleCtaApiResponse);
+        await Assert.ThrowsAsync<NotFoundException>(responseMessage.HandleCtaApiResponse<ArrivalsResponse>);
     }
 
     [Fact]
@@ -88,7 +88,7 @@ public class HttpResponseMessageExtensionsTests
             Content = new StringContent(JsonSerializer.Serialize(apiResult, JsonOptions), Encoding.UTF8, MediaTypeNames.Application.Json)
         };
 
-        await Assert.ThrowsAsync<ServiceTimedOutException>(responseMessage.HandleCtaApiResponse);
+        await Assert.ThrowsAsync<ServiceTimedOutException>(responseMessage.HandleCtaApiResponse<ArrivalsResponse>);
     }
 
     [Theory]
@@ -103,7 +103,7 @@ public class HttpResponseMessageExtensionsTests
             Content = new StringContent(JsonSerializer.Serialize(apiResult, JsonOptions), Encoding.UTF8, MediaTypeNames.Application.Json)
         };
 
-        await Assert.ThrowsAsync<ServiceUnavailableException>(responseMessage.HandleCtaApiResponse);
+        await Assert.ThrowsAsync<ServiceUnavailableException>(responseMessage.HandleCtaApiResponse<ArrivalsResponse>);
     }
 
     [Fact]
@@ -114,7 +114,7 @@ public class HttpResponseMessageExtensionsTests
             Content = new StringContent(JsonSerializer.Serialize(apiResult, JsonOptions), Encoding.UTF8, MediaTypeNames.Application.Json)
         };
 
-        await Assert.ThrowsAsync<ServiceException>(responseMessage.HandleCtaApiResponse);
+        await Assert.ThrowsAsync<ServiceException>(responseMessage.HandleCtaApiResponse<ArrivalsResponse>);
     }
 
     #endregion HTTP Errors
@@ -131,7 +131,7 @@ public class HttpResponseMessageExtensionsTests
             Content = new StringContent(JsonSerializer.Serialize(apiResult, JsonOptions), Encoding.UTF8, MediaTypeNames.Application.Json)
         };
 
-        await Assert.ThrowsAsync<MissingParameterException>(responseMessage.HandleCtaApiResponse);
+        await Assert.ThrowsAsync<MissingParameterException>(responseMessage.HandleCtaApiResponse<ArrivalsResponse>);
     }
 
     [Fact]
@@ -144,7 +144,7 @@ public class HttpResponseMessageExtensionsTests
             Content = new StringContent(JsonSerializer.Serialize(apiResult, JsonOptions), Encoding.UTF8, MediaTypeNames.Application.Json)
         };
 
-        await Assert.ThrowsAsync<InvalidApiKeyException>(responseMessage.HandleCtaApiResponse);
+        await Assert.ThrowsAsync<InvalidApiKeyException>(responseMessage.HandleCtaApiResponse<ArrivalsResponse>);
     }
 
     [Fact]
@@ -157,7 +157,7 @@ public class HttpResponseMessageExtensionsTests
             Content = new StringContent(JsonSerializer.Serialize(apiResult, JsonOptions), Encoding.UTF8, MediaTypeNames.Application.Json)
         };
 
-        await Assert.ThrowsAsync<DailyLimitExceededException>(responseMessage.HandleCtaApiResponse);
+        await Assert.ThrowsAsync<DailyLimitExceededException>(responseMessage.HandleCtaApiResponse<ArrivalsResponse>);
     }
 
     [Theory]
@@ -178,7 +178,7 @@ public class HttpResponseMessageExtensionsTests
             Content = new StringContent(JsonSerializer.Serialize(apiResult, JsonOptions), Encoding.UTF8, MediaTypeNames.Application.Json)
         };
 
-        await Assert.ThrowsAsync<InvalidParameterException>(responseMessage.HandleCtaApiResponse);
+        await Assert.ThrowsAsync<InvalidParameterException>(responseMessage.HandleCtaApiResponse<ArrivalsResponse>);
     }
 
     [Theory]
@@ -194,7 +194,7 @@ public class HttpResponseMessageExtensionsTests
             Content = new StringContent(JsonSerializer.Serialize(apiResult, JsonOptions), Encoding.UTF8, MediaTypeNames.Application.Json)
         };
 
-        await Assert.ThrowsAsync<MaxValuesExceededException>(responseMessage.HandleCtaApiResponse);
+        await Assert.ThrowsAsync<MaxValuesExceededException>(responseMessage.HandleCtaApiResponse<ArrivalsResponse>);
     }
 
     [Fact]
@@ -207,7 +207,7 @@ public class HttpResponseMessageExtensionsTests
             Content = new StringContent(JsonSerializer.Serialize(apiResult, JsonOptions), Encoding.UTF8, MediaTypeNames.Application.Json)
         };
 
-        await Assert.ThrowsAsync<ServerErrorException>(responseMessage.HandleCtaApiResponse);
+        await Assert.ThrowsAsync<ServerErrorException>(responseMessage.HandleCtaApiResponse<ArrivalsResponse>);
     }
 
     #endregion CTA Errors

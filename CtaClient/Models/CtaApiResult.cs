@@ -8,11 +8,11 @@ namespace CtaClient.Models;
 ///   This class exists to help with deserialization as a representation of that root,
 ///   while making the actual response data more accessible in its own <see cref="ArrivalsResponse"/> class
 /// </summary>
-public class CtaApiResult
+public class CtaApiResult<T> where T : AbstractCtaResponse
 {
     /// <summary>
-    ///   Numeric station identifier. Required if StopId is not specified
+    ///   Root response of any train tracker API request
     /// </summary>
     [JsonPropertyName("ctatt")]
-    public required ArrivalsResponse Response { get; set; }
+    public required T Response { get; set; }
 }
