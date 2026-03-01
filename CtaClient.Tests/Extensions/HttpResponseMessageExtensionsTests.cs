@@ -170,6 +170,7 @@ public class HttpResponseMessageExtensionsTests
     [InlineData(ErrorCode.NonPositiveMaxParam)]
     [InlineData(ErrorCode.InvalidRoute)]
     [InlineData(ErrorCode.InvalidParameter)]
+    [InlineData(ErrorCode.TrainNotFound)]
     public async Task EnsureCtaApiSuccess_InvalidParameter_Throws(ErrorCode errorCode)
     {
         apiResult.Response.ErrorCode = errorCode;
@@ -196,6 +197,21 @@ public class HttpResponseMessageExtensionsTests
         };
 
         await Assert.ThrowsAsync<MaxValuesExceededException>(responseMessage.HandleCtaApiResponse<ArrivalsResponse>);
+    }
+
+    [Theory]
+    [InlineData(ErrorCode.StopsUnavailable)]
+    [InlineData(ErrorCode.PredictionsUnavailable)]
+    public async Task EnsureCtaApiSuccess_PredictionError_Throws(ErrorCode errorCode)
+    {
+        apiResult.Response.ErrorCode = errorCode;
+
+        var responseMessage = new HttpResponseMessage(HttpStatusCode.OK)
+        {
+            Content = new StringContent(JsonSerializer.Serialize(apiResult, JsonOptions), Encoding.UTF8, MediaTypeNames.Application.Json)
+        };
+
+        await Assert.ThrowsAsync<PredictionException>(responseMessage.HandleCtaApiResponse<ArrivalsResponse>);
     }
 
     [Fact]

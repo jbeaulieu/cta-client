@@ -74,11 +74,15 @@ internal static class HttpResponseMessageExtensions
             case ErrorCode.NonPositiveMaxParam:
             case ErrorCode.InvalidRoute:
             case ErrorCode.InvalidParameter:
+            case ErrorCode.TrainNotFound:
                 throw new InvalidParameterException(result.Response.ErrorCode, result.Response.ErrorDescription);
             case ErrorCode.MaxMapIdsExceeded:
             case ErrorCode.MaxStopIdsExceeded:
             case ErrorCode.MaxRoutesExceeded:
                 throw new MaxValuesExceededException(result.Response.ErrorCode, result.Response.ErrorDescription);
+            case ErrorCode.StopsUnavailable:
+            case ErrorCode.PredictionsUnavailable:
+                throw new PredictionException(result.Response.ErrorCode, result.Response.ErrorDescription);
             case ErrorCode.ServerError:
                 throw new ServerErrorException(result.Response.ErrorDescription);
             default:
