@@ -1,9 +1,10 @@
 using System.Reflection;
 using System.Text.Json.Serialization;
+using CtaClient.Json;
 
 namespace CtaClient.Models;
 
-[JsonConverter(typeof(JsonStringEnumConverter))]
+[JsonConverter(typeof(JsonRouteConverter))]
 public enum Route
 {
     [JsonStringEnumMemberName("Red")]

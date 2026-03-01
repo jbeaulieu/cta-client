@@ -17,6 +17,7 @@ internal static class HttpResponseMessageExtensions
         Converters =
         {
             new JsonBoolConverter(),
+            new JsonRouteConverter(),
             new JsonStringEnumConverter(),
         },
     };

@@ -21,6 +21,7 @@ public class HttpResponseMessageExtensionsTests
         Converters =
         {
             new JsonBoolConverter(),
+            new JsonRouteConverter(),
             new JsonStringEnumConverter(),
         },
     };
