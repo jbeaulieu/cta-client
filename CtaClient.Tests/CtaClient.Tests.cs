@@ -30,7 +30,7 @@ public class CtaClientTests
         var arrivalsResponse = new ArrivalsResponse
         {
             Timestamp = DateTimeOffset.Now,
-            ErrorCode = 0,
+            ErrorCode = ErrorCode.None,
             Arrivals = [ new() { Route = Route.Red }],
         };
 
@@ -65,6 +65,42 @@ public class CtaClientTests
 
         Assert.Single(httpMessageHandler.Invocations);
         Assert.IsType<ArrivalsResponse>(result);
+        Assert.Single(result.Arrivals);
+        Assert.Equal(Route.Red, result.Arrivals[0].Route);
+    }
+
+    [Fact]
+    public async Task Client_FollowThisTrain_Runs()
+    {
+        var followTrainResponse = new FollowTrainResponse
+        {
+            Timestamp = DateTimeOffset.Now,
+            ErrorCode = ErrorCode.None,
+            Position = new TrainPosition(),
+            Arrivals = [ new() { Route = Route.Red }]
+        };
+
+        var ctaResponse = new CtaApiResult<FollowTrainResponse>(){ Response = followTrainResponse };
+
+        var httpMessageHandler = new Mock<HttpMessageHandler>();
+        httpMessageHandler.Protected()
+            .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(), ItExpr.IsAny<CancellationToken>())
+            .ReturnsAsync(
+                new HttpResponseMessage(HttpStatusCode.OK)
+                {
+                    Content = new StringContent(JsonSerializer.Serialize(ctaResponse))
+                });
+
+        var request = new FollowTrainRequest
+        {
+            RunNumber = 12345,
+        };
+
+        var client = CreateCtaClient(httpMessageHandler);
+        var result = await client.Object.FollowThisTrain(request);
+
+        Assert.Single(httpMessageHandler.Invocations);
+        Assert.IsType<FollowTrainResponse>(result);
         Assert.Single(result.Arrivals);
         Assert.Equal(Route.Red, result.Arrivals[0].Route);
     }

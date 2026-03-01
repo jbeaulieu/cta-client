@@ -31,6 +31,10 @@ public static class Program
         var result = await client.GetArrivals(request);
 
         System.Console.WriteLine(JsonSerializer.Serialize(result, jsonOptions));
+
+        var followResult = await client.FollowThisTrain( new(){ RunNumber = 810 } );
+
+        System.Console.WriteLine(JsonSerializer.Serialize(followResult, jsonOptions));
     }
 
     private static ServiceProvider CreateServices(IConfiguration configuration)
