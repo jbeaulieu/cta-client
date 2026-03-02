@@ -82,6 +82,22 @@ public enum ErrorCode
     InvalidParameter = 500,
 
     /// <summary>
+    ///   The train with the run number provided may have left service, or the run number may be incorrect
+    /// </summary>
+    TrainNotFound = 501,
+
+    /// <summary>
+    ///   The train with the run number provided has an unexpected exit station id,
+    ///     and the system cannot reliably determine which predictions to report
+    /// </summary>
+    StopsUnavailable = 502,
+
+    /// <summary>
+    ///   The train with the run number provided has no available predictions for active stations
+    /// </summary>
+    PredictionsUnavailable = 503,
+
+    /// <summary>
     ///   A server error occurred
     /// </summary>
     ServerError = 900

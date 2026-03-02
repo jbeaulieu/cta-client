@@ -11,11 +11,23 @@ internal class CtaClient(HttpClient httpClient, CtaEndpointFactory endpointFacto
     {
         logger.LogInformation("[CtaClient] GetArrivals() called.");
 
-        var uri = endpointFactory.GetArrvialsEndpoint(request);
+        var uri = endpointFactory.GetArrivalsEndpoint(request);
 
         var response = await SendAsync(uri);
 
-        return await response.HandleCtaApiResponse();
+        return await response.HandleCtaApiResponse<ArrivalsResponse>();
+    }
+
+    /// <inheritdoc />
+    public async Task<FollowTrainResponse> FollowThisTrain(FollowTrainRequest request)
+    {
+        logger.LogInformation("[CtaClient] FollowThisTrain() called.");
+
+        var uri = endpointFactory.GetFollowThisTrainEndpoint(request);
+
+        var response = await SendAsync(uri);
+
+        return await response.HandleCtaApiResponse<FollowTrainResponse>();
     }
 
     private async Task<HttpResponseMessage> SendAsync(Uri requestUri)
