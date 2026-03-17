@@ -1,4 +1,3 @@
-using System.Net;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using CtaClient.Exceptions;
@@ -34,40 +33,27 @@ internal static class HttpResponseMessageExtensions
     /// <returns>The validated ArrivalsResponse deserialized from the message response</returns>
     internal static async Task<Result<T>> HandleCtaApiResponse<T>(this HttpResponseMessage response) where T : AbstractCtaResponse
     {
-        // Ensure we have a successul response code, or throw a service exception
-        if (!response.IsSuccessStatusCode)
+        try
         {
-            switch (response.StatusCode)
+            response.EnsureSuccessStatusCode();
+
+            var responseContent = await response.Content.ReadAsStringAsync();
+            var result = JsonSerializer.Deserialize<CtaApiResult<T>>(responseContent, JsonOptions) ??
+                throw new JsonException($"Unable to deserialize payload: [{responseContent}]");
+
+            if(result.Response.ErrorCode == ErrorCode.None)
             {
-                case HttpStatusCode.NotFound:
-                    throw new NotFoundException(response.StatusCode);
-                case HttpStatusCode.RequestTimeout:
-                    throw new ServiceTimedOutException(response.StatusCode);
-                case HttpStatusCode.NotImplemented:
-                case HttpStatusCode.BadGateway:
-                case HttpStatusCode.ServiceUnavailable:
-                case HttpStatusCode.GatewayTimeout:
-                    throw new ServiceUnavailableException(response.StatusCode);
-                default:
-                    throw new ServiceException(response.StatusCode);
+                return Result<T>.Success(result.Response);
+            }
+            else
+            {
+                Error error = new(result.Response.ErrorCode, result.Response.ErrorDescription ?? string.Empty);
+                return Result<T>.Failure(error);
             }
         }
-
-        // Attempt to deserialize the response
-        var responseContent = await response.Content.ReadAsStringAsync();
-        var result = JsonSerializer.Deserialize<CtaApiResult<T>>(responseContent, JsonOptions) ??
-            throw new JsonException($"Unable to deserialize payload: [{responseContent}]");
-
-        // If the error code of the response indicates success, return the deserialized result.
-        // Otherwise, construct an Error and return it as a failed Result.
-        if(result.Response.ErrorCode == ErrorCode.None)
+        catch (Exception ex)
         {
-            return Result<T>.Success(result.Response);
-        }
-        else
-        {
-            Error error = new(result.Response.ErrorCode, result.Response.ErrorDescription ?? string.Empty);
-            return Result<T>.Failure(error);
+            throw new CtaClientException("[HandleCtaApiResponse] An error occurred while processing CTA response", ex);
         }
     }
 }

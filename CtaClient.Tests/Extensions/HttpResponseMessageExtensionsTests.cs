@@ -89,8 +89,6 @@ public class HttpResponseMessageExtensionsTests
         Assert.NotNull(result.Value);
     }
 
-    #region HTTP Errors
-
     [Fact]
     public async Task HandleCtaApiResponse_InvalidJson_Throws()
     {
@@ -101,55 +99,30 @@ public class HttpResponseMessageExtensionsTests
             Content = new StringContent(badJson, Encoding.UTF8, MediaTypeNames.Application.Json)
         };
 
-        await Assert.ThrowsAsync<JsonException>(responseMessage.HandleCtaApiResponse<ArrivalsResponse>);
+        var ex = await Assert.ThrowsAsync<CtaClientException>(responseMessage.HandleCtaApiResponse<ArrivalsResponse>);
+        Assert.IsType<JsonException>(ex.InnerException);
     }
 
-    [Fact]
-    public async Task HandleCtaApiResponse_NotFound_Throws()
-    {
-        var responseMessage = new HttpResponseMessage(HttpStatusCode.NotFound)
-        {
-            Content = new StringContent(JsonSerializer.Serialize(arrivalsApiResult, JsonOptions), Encoding.UTF8, MediaTypeNames.Application.Json)
-        };
-
-        await Assert.ThrowsAsync<NotFoundException>(responseMessage.HandleCtaApiResponse<ArrivalsResponse>);
-    }
-
-    [Fact]
-    public async Task HandleCtaApiResponse_RequestTimeout_Throws()
-    {
-        var responseMessage = new HttpResponseMessage(HttpStatusCode.RequestTimeout)
-        {
-            Content = new StringContent(JsonSerializer.Serialize(arrivalsApiResult, JsonOptions), Encoding.UTF8, MediaTypeNames.Application.Json)
-        };
-
-        await Assert.ThrowsAsync<ServiceTimedOutException>(responseMessage.HandleCtaApiResponse<ArrivalsResponse>);
-    }
+    #region HTTP Errors
 
     [Theory]
+    [InlineData(HttpStatusCode.BadRequest)]
+    [InlineData(HttpStatusCode.NotFound)]
+    [InlineData(HttpStatusCode.RequestTimeout)]
     [InlineData(HttpStatusCode.NotImplemented)]
     [InlineData(HttpStatusCode.BadGateway)]
     [InlineData(HttpStatusCode.ServiceUnavailable)]
     [InlineData(HttpStatusCode.GatewayTimeout)]
-    public async Task HandleCtaApiResponse_ServiceUnavailable_Throws(HttpStatusCode statusCode)
+    public async Task HandleCtaApiResponse_HttpError_Throws(HttpStatusCode statusCode)
     {
         var responseMessage = new HttpResponseMessage(statusCode)
         {
             Content = new StringContent(JsonSerializer.Serialize(arrivalsApiResult, JsonOptions), Encoding.UTF8, MediaTypeNames.Application.Json)
         };
 
-        await Assert.ThrowsAsync<ServiceUnavailableException>(responseMessage.HandleCtaApiResponse<ArrivalsResponse>);
-    }
-
-    [Fact]
-    public async Task HandleCtaApiResponse_OtherError_Throws()
-    {
-        var responseMessage = new HttpResponseMessage(HttpStatusCode.BadRequest)
-        {
-            Content = new StringContent(JsonSerializer.Serialize(arrivalsApiResult, JsonOptions), Encoding.UTF8, MediaTypeNames.Application.Json)
-        };
-
-        await Assert.ThrowsAsync<ServiceException>(responseMessage.HandleCtaApiResponse<ArrivalsResponse>);
+        var ex = await Assert.ThrowsAsync<CtaClientException>(responseMessage.HandleCtaApiResponse<ArrivalsResponse>);
+        Assert.IsType<HttpRequestException>(ex.InnerException);
+        Assert.Equal(statusCode, ((HttpRequestException)ex.InnerException).StatusCode);
     }
 
     #endregion HTTP Errors
