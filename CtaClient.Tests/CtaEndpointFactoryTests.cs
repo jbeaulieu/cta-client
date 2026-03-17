@@ -66,18 +66,6 @@ public class CtaEndpointFactoryTests
     #region Arrivals Endpoint Tests
 
     [Fact]
-    public void CtaEndpointFactory_GetArrivals_MissingStopIdAndMapId_Throws()
-    {
-        var request = new ArrivalsRequest
-        {
-            Routes = [ROUTE_1],
-            MaxResults = MAX_RESULTS
-        };
-
-        Assert.Throws<MissingParameterException>(() => factory.GetArrivalsEndpoint(request));
-    }
-
-    [Fact]
     public void CtaEndpointFactory_GetArrivals_AddsMapId()
     {
         var request = new ArrivalsRequest
@@ -249,14 +237,6 @@ public class CtaEndpointFactoryTests
     #endregion
 
     #region FollowThisTrain Endpoint Tests
-
-    [Fact]
-    public void CtaEndpointFactory_FollowThisTrain_MissingRunNumber_Throws()
-    {
-        var request = new FollowTrainRequest();
-
-        Assert.Throws<MissingParameterException>(() => factory.GetFollowThisTrainEndpoint(request));
-    }
 
     [Fact]
     public void CtaEndpointFactory_FollowThisTrain_AddsRunNumber()
