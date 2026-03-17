@@ -27,9 +27,12 @@ internal static class HttpResponseMessageExtensions
     ///     model if so. If the response indicates an error, either from the response status code or
     ///     a CTA error code, a corresponding exception is thrown.
     /// </summary>
-    /// <param name="response">The Http response message to validate</param>
+    /// <typeparam name="T">
+    ///     The type that the response should be deserialized to. Must inherit from <see cref="AbstractCtaResponse"/>.
+    /// </typeparam>
+    /// <param name="response">The Http response message to validate and deserialize.</param>
     /// <returns>The validated ArrivalsResponse deserialized from the message response</returns>
-    internal static async Task<T> HandleCtaApiResponse<T>(this HttpResponseMessage response) where T : AbstractCtaResponse
+    internal static async Task<Result<T>> HandleCtaApiResponse<T>(this HttpResponseMessage response) where T : AbstractCtaResponse
     {
         // Ensure we have a successul response code, or throw a service exception
         if (!response.IsSuccessStatusCode)
@@ -55,38 +58,16 @@ internal static class HttpResponseMessageExtensions
         var result = JsonSerializer.Deserialize<CtaApiResult<T>>(responseContent, JsonOptions) ??
             throw new JsonException($"Unable to deserialize payload: [{responseContent}]");
 
-        // Extract any errors from the response. If there are none, return the deserialized object
-        switch (result.Response.ErrorCode)
+        // If the error code of the response indicates success, return the deserialized result.
+        // Otherwise, construct an Error and return it as a failed Result.
+        if(result.Response.ErrorCode == ErrorCode.None)
         {
-            case ErrorCode.None:
-                return result.Response;
-            case ErrorCode.MissingParameter:
-                throw new MissingParameterException(result.Response.ErrorDescription);
-            case ErrorCode.InvalidApiKey:
-                throw new InvalidApiKeyException(result.Response.ErrorDescription);
-            case ErrorCode.DailyLimitExceeded:
-                throw new DailyLimitExceededException(result.Response.ErrorDescription);
-            case ErrorCode.InvalidMapId:
-            case ErrorCode.MapIdNotInteger:
-            case ErrorCode.InvalidStopId:
-            case ErrorCode.StopIdNotInteger:
-            case ErrorCode.InvalidMaxParam:
-            case ErrorCode.NonPositiveMaxParam:
-            case ErrorCode.InvalidRoute:
-            case ErrorCode.InvalidParameter:
-            case ErrorCode.TrainNotFound:
-                throw new InvalidParameterException(result.Response.ErrorCode, result.Response.ErrorDescription);
-            case ErrorCode.MaxMapIdsExceeded:
-            case ErrorCode.MaxStopIdsExceeded:
-            case ErrorCode.MaxRoutesExceeded:
-                throw new MaxValuesExceededException(result.Response.ErrorCode, result.Response.ErrorDescription);
-            case ErrorCode.StopsUnavailable:
-            case ErrorCode.PredictionsUnavailable:
-                throw new PredictionException(result.Response.ErrorCode, result.Response.ErrorDescription);
-            case ErrorCode.ServerError:
-                throw new ServerErrorException(result.Response.ErrorDescription);
-            default:
-                throw new CtaException(result.Response.ErrorCode, result.Response.ErrorDescription);
+            return Result<T>.Success(result.Response);
+        }
+        else
+        {
+            Error error = new(result.Response.ErrorCode, result.Response.ErrorDescription ?? string.Empty);
+            return Result<T>.Failure(error);
         }
     }
 }

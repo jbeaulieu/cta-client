@@ -7,7 +7,7 @@ namespace CtaClient;
 internal class CtaClient(HttpClient httpClient, CtaEndpointFactory endpointFactory, ILogger<CtaClient> logger): ICtaClient
 {
     /// <inheritdoc />
-    public async Task<ArrivalsResponse> GetArrivals(ArrivalsRequest request)
+    public async Task<Result<ArrivalsResponse>> GetArrivals(ArrivalsRequest request)
     {
         logger.LogInformation("[CtaClient] GetArrivals() called.");
 
@@ -19,7 +19,7 @@ internal class CtaClient(HttpClient httpClient, CtaEndpointFactory endpointFacto
     }
 
     /// <inheritdoc />
-    public async Task<FollowTrainResponse> FollowThisTrain(FollowTrainRequest request)
+    public async Task<Result<FollowTrainResponse>> FollowThisTrain(FollowTrainRequest request)
     {
         logger.LogInformation("[CtaClient] FollowThisTrain() called.");
 
