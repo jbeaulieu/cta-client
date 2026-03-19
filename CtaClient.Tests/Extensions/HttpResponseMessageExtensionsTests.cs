@@ -67,7 +67,10 @@ public class HttpResponseMessageExtensionsTests
 
         var result = await responseMessage.HandleCtaApiResponse<ArrivalsResponse>();
 
-        Assert.IsType<ArrivalsResponse>(result);
+        Assert.IsType<Result<ArrivalsResponse>>(result);
+        Assert.True(result.IsSuccess);
+        Assert.Equal(Error.None, result.Error);
+        Assert.NotNull(result.Value);
     }
 
     [Fact]
@@ -80,10 +83,11 @@ public class HttpResponseMessageExtensionsTests
 
         var result = await responseMessage.HandleCtaApiResponse<ArrivalsResponse>();
 
-        Assert.IsType<ArrivalsResponse>(result);
+        Assert.IsType<Result<ArrivalsResponse>>(result);
+        Assert.True(result.IsSuccess);
+        Assert.Equal(Error.None, result.Error);
+        Assert.NotNull(result.Value);
     }
-
-    #region HTTP Errors
 
     [Fact]
     public async Task HandleCtaApiResponse_InvalidJson_Throws()
@@ -95,142 +99,56 @@ public class HttpResponseMessageExtensionsTests
             Content = new StringContent(badJson, Encoding.UTF8, MediaTypeNames.Application.Json)
         };
 
-        await Assert.ThrowsAsync<JsonException>(responseMessage.HandleCtaApiResponse<ArrivalsResponse>);
+        var ex = await Assert.ThrowsAsync<CtaClientException>(responseMessage.HandleCtaApiResponse<ArrivalsResponse>);
+        Assert.IsType<JsonException>(ex.InnerException);
     }
 
-    [Fact]
-    public async Task HandleCtaApiResponse_NotFound_Throws()
-    {
-        var responseMessage = new HttpResponseMessage(HttpStatusCode.NotFound)
-        {
-            Content = new StringContent(JsonSerializer.Serialize(arrivalsApiResult, JsonOptions), Encoding.UTF8, MediaTypeNames.Application.Json)
-        };
-
-        await Assert.ThrowsAsync<NotFoundException>(responseMessage.HandleCtaApiResponse<ArrivalsResponse>);
-    }
-
-    [Fact]
-    public async Task HandleCtaApiResponse_RequestTimeout_Throws()
-    {
-        var responseMessage = new HttpResponseMessage(HttpStatusCode.RequestTimeout)
-        {
-            Content = new StringContent(JsonSerializer.Serialize(arrivalsApiResult, JsonOptions), Encoding.UTF8, MediaTypeNames.Application.Json)
-        };
-
-        await Assert.ThrowsAsync<ServiceTimedOutException>(responseMessage.HandleCtaApiResponse<ArrivalsResponse>);
-    }
+    #region HTTP Errors
 
     [Theory]
+    [InlineData(HttpStatusCode.BadRequest)]
+    [InlineData(HttpStatusCode.NotFound)]
+    [InlineData(HttpStatusCode.RequestTimeout)]
     [InlineData(HttpStatusCode.NotImplemented)]
     [InlineData(HttpStatusCode.BadGateway)]
     [InlineData(HttpStatusCode.ServiceUnavailable)]
     [InlineData(HttpStatusCode.GatewayTimeout)]
-    public async Task HandleCtaApiResponse_ServiceUnavailable_Throws(HttpStatusCode statusCode)
+    public async Task HandleCtaApiResponse_HttpError_Throws(HttpStatusCode statusCode)
     {
         var responseMessage = new HttpResponseMessage(statusCode)
         {
             Content = new StringContent(JsonSerializer.Serialize(arrivalsApiResult, JsonOptions), Encoding.UTF8, MediaTypeNames.Application.Json)
         };
 
-        await Assert.ThrowsAsync<ServiceUnavailableException>(responseMessage.HandleCtaApiResponse<ArrivalsResponse>);
-    }
-
-    [Fact]
-    public async Task HandleCtaApiResponse_OtherError_Throws()
-    {
-        var responseMessage = new HttpResponseMessage(HttpStatusCode.BadRequest)
-        {
-            Content = new StringContent(JsonSerializer.Serialize(arrivalsApiResult, JsonOptions), Encoding.UTF8, MediaTypeNames.Application.Json)
-        };
-
-        await Assert.ThrowsAsync<ServiceException>(responseMessage.HandleCtaApiResponse<ArrivalsResponse>);
+        var ex = await Assert.ThrowsAsync<CtaClientException>(responseMessage.HandleCtaApiResponse<ArrivalsResponse>);
+        Assert.IsType<HttpRequestException>(ex.InnerException);
+        Assert.Equal(statusCode, ((HttpRequestException)ex.InnerException).StatusCode);
     }
 
     #endregion HTTP Errors
 
     #region CTA Errors
 
-    [Fact]
-    public async Task HandleCtaApiResponse_MissingParameter_Throws()
-    {
-        arrivalsApiResult.Response.ErrorCode = ErrorCode.MissingParameter;
-
-        var responseMessage = new HttpResponseMessage(HttpStatusCode.OK)
-        {
-            Content = new StringContent(JsonSerializer.Serialize(arrivalsApiResult, JsonOptions), Encoding.UTF8, MediaTypeNames.Application.Json)
-        };
-
-        await Assert.ThrowsAsync<MissingParameterException>(responseMessage.HandleCtaApiResponse<ArrivalsResponse>);
-    }
-
-    [Fact]
-    public async Task HandleCtaApiResponse_InvalidApiKey_Throws()
-    {
-        arrivalsApiResult.Response.ErrorCode = ErrorCode.InvalidApiKey;
-
-        var responseMessage = new HttpResponseMessage(HttpStatusCode.OK)
-        {
-            Content = new StringContent(JsonSerializer.Serialize(arrivalsApiResult, JsonOptions), Encoding.UTF8, MediaTypeNames.Application.Json)
-        };
-
-        await Assert.ThrowsAsync<InvalidApiKeyException>(responseMessage.HandleCtaApiResponse<ArrivalsResponse>);
-    }
-
-    [Fact]
-    public async Task HandleCtaApiResponse_LimitExceeded_Throws()
-    {
-        arrivalsApiResult.Response.ErrorCode = ErrorCode.DailyLimitExceeded;
-
-        var responseMessage = new HttpResponseMessage(HttpStatusCode.OK)
-        {
-            Content = new StringContent(JsonSerializer.Serialize(arrivalsApiResult, JsonOptions), Encoding.UTF8, MediaTypeNames.Application.Json)
-        };
-
-        await Assert.ThrowsAsync<DailyLimitExceededException>(responseMessage.HandleCtaApiResponse<ArrivalsResponse>);
-    }
-
     [Theory]
+    [InlineData(ErrorCode.MissingParameter)]
+    [InlineData(ErrorCode.InvalidApiKey)]
+    [InlineData(ErrorCode.DailyLimitExceeded)]
     [InlineData(ErrorCode.InvalidMapId)]
     [InlineData(ErrorCode.MapIdNotInteger)]
+    [InlineData(ErrorCode.MaxMapIdsExceeded)]
+    [InlineData(ErrorCode.InvalidRoute)]
+    [InlineData(ErrorCode.MaxRoutesExceeded)]
     [InlineData(ErrorCode.InvalidStopId)]
-    [InlineData(ErrorCode.StopIdNotInteger)]
+    [InlineData(ErrorCode.MaxStopIdsExceeded)]
     [InlineData(ErrorCode.InvalidMaxParam)]
     [InlineData(ErrorCode.NonPositiveMaxParam)]
-    [InlineData(ErrorCode.InvalidRoute)]
+    [InlineData(ErrorCode.StopIdNotInteger)]
     [InlineData(ErrorCode.InvalidParameter)]
     [InlineData(ErrorCode.TrainNotFound)]
-    public async Task HandleCtaApiResponse_InvalidParameter_Throws(ErrorCode errorCode)
-    {
-        arrivalsApiResult.Response.ErrorCode = errorCode;
-
-        var responseMessage = new HttpResponseMessage(HttpStatusCode.OK)
-        {
-            Content = new StringContent(JsonSerializer.Serialize(arrivalsApiResult, JsonOptions), Encoding.UTF8, MediaTypeNames.Application.Json)
-        };
-
-        await Assert.ThrowsAsync<InvalidParameterException>(responseMessage.HandleCtaApiResponse<ArrivalsResponse>);
-    }
-
-    [Theory]
-    [InlineData(ErrorCode.MaxMapIdsExceeded)]
-    [InlineData(ErrorCode.MaxStopIdsExceeded)]
-    [InlineData(ErrorCode.MaxRoutesExceeded)]
-    public async Task HandleCtaApiResponse_MaxValuesExceeded_Throws(ErrorCode errorCode)
-    {
-        arrivalsApiResult.Response.ErrorCode = errorCode;
-
-        var responseMessage = new HttpResponseMessage(HttpStatusCode.OK)
-        {
-            Content = new StringContent(JsonSerializer.Serialize(arrivalsApiResult, JsonOptions), Encoding.UTF8, MediaTypeNames.Application.Json)
-        };
-
-        await Assert.ThrowsAsync<MaxValuesExceededException>(responseMessage.HandleCtaApiResponse<ArrivalsResponse>);
-    }
-
-    [Theory]
     [InlineData(ErrorCode.StopsUnavailable)]
     [InlineData(ErrorCode.PredictionsUnavailable)]
-    public async Task HandleCtaApiResponse_PredictionError_Throws(ErrorCode errorCode)
+    [InlineData(ErrorCode.ServerError)]
+    public async Task HandleCtaApiResponse_WithErrorCode_Runs(ErrorCode errorCode)
     {
         arrivalsApiResult.Response.ErrorCode = errorCode;
 
@@ -239,20 +157,12 @@ public class HttpResponseMessageExtensionsTests
             Content = new StringContent(JsonSerializer.Serialize(arrivalsApiResult, JsonOptions), Encoding.UTF8, MediaTypeNames.Application.Json)
         };
 
-        await Assert.ThrowsAsync<PredictionException>(responseMessage.HandleCtaApiResponse<ArrivalsResponse>);
-    }
+        var result = await responseMessage.HandleCtaApiResponse<ArrivalsResponse>();
 
-    [Fact]
-    public async Task HandleCtaApiResponse_ServerError_Throws()
-    {
-        arrivalsApiResult.Response.ErrorCode = ErrorCode.ServerError;
-
-        var responseMessage = new HttpResponseMessage(HttpStatusCode.OK)
-        {
-            Content = new StringContent(JsonSerializer.Serialize(arrivalsApiResult, JsonOptions), Encoding.UTF8, MediaTypeNames.Application.Json)
-        };
-
-        await Assert.ThrowsAsync<ServerErrorException>(responseMessage.HandleCtaApiResponse<ArrivalsResponse>);
+        Assert.IsType<Result<ArrivalsResponse>>(result);
+        Assert.True(result.IsFailure);
+        Assert.Equal(errorCode, result.Error.Code);
+        Assert.Null(result.Value);
     }
 
     #endregion CTA Errors

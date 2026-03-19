@@ -64,9 +64,12 @@ public class CtaClientTests
         var result = await client.Object.GetArrivals(request);
 
         Assert.Single(httpMessageHandler.Invocations);
-        Assert.IsType<ArrivalsResponse>(result);
-        Assert.Single(result.Arrivals);
-        Assert.Equal(Route.Red, result.Arrivals[0].Route);
+
+        Assert.IsType<Result<ArrivalsResponse>>(result);
+
+        Assert.True(result.IsSuccess);
+        Assert.Single(result.Value!.Arrivals);
+        Assert.Equal(Route.Red, result.Value!.Arrivals[0].Route);
     }
 
     [Fact]
@@ -100,8 +103,9 @@ public class CtaClientTests
         var result = await client.Object.FollowThisTrain(request);
 
         Assert.Single(httpMessageHandler.Invocations);
-        Assert.IsType<FollowTrainResponse>(result);
-        Assert.Single(result.Arrivals);
-        Assert.Equal(Route.Red, result.Arrivals[0].Route);
+
+        Assert.IsType<Result<FollowTrainResponse>>(result);
+        Assert.Single(result.Value!.Arrivals);
+        Assert.Equal(Route.Red, result.Value!.Arrivals[0].Route);
     }
 }

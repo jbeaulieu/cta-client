@@ -1,5 +1,4 @@
 using CtaClient.Config;
-using CtaClient.Exceptions;
 using CtaClient.Models;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Options;
@@ -30,12 +29,6 @@ internal class CtaEndpointFactory
     /// </summary>
     internal Uri GetArrivalsEndpoint(ArrivalsRequest request)
     {
-        // Validation: At least one of request.MapId and request.StopId should be populated.
-        if (IsNullOrEmpty(request.MapIds) && IsNullOrEmpty(request.StopIds))
-        {
-            throw new MissingParameterException("MapId or StopId must be specified");
-        }
-
         var builder = new UriBuilder(BaseAddress);
         builder.Path += CTA_ARRIVALS_PATH;
 
@@ -75,12 +68,6 @@ internal class CtaEndpointFactory
     /// </summary>
     internal Uri GetFollowThisTrainEndpoint(FollowTrainRequest request)
     {
-        // Validation: request.RunNumber must be a postive value.
-        if (request.RunNumber < 1)
-        {
-            throw new MissingParameterException("RunNumber must be a positive integer");
-        }
-
         var builder = new UriBuilder(BaseAddress);
         builder.Path += CTA_FOLLOW_TRAIN_PATH;
 
@@ -94,9 +81,4 @@ internal class CtaEndpointFactory
 
         return new Uri(endpoint, UriKind.Absolute);
     }
-
-    /// <summary>
-    ///   Validates that a list is not null and has at least one element.
-    /// </summary>
-    private static bool IsNullOrEmpty(List<int>? list) => list == null || list.Count == 0;
 }
