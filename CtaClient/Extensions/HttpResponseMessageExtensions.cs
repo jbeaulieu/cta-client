@@ -38,16 +38,15 @@ internal static class HttpResponseMessageExtensions
             response.EnsureSuccessStatusCode();
 
             var responseContent = await response.Content.ReadAsStringAsync();
-            var result = JsonSerializer.Deserialize<CtaApiResult<T>>(responseContent, JsonOptions) ??
-                throw new JsonException($"Unable to deserialize payload: [{responseContent}]");
+            var result = JsonUtils.Deserialize<T>(responseContent, JsonOptions, ignoreRoot: true);
 
-            if(result.Response.ErrorCode == ErrorCode.None)
+            if(result.ErrorCode == ErrorCode.None)
             {
-                return Result<T>.Success(result.Response);
+                return Result<T>.Success(result);
             }
             else
             {
-                Error error = new(result.Response.ErrorCode, result.Response.ErrorDescription ?? string.Empty);
+                Error error = new(result.ErrorCode, result.ErrorDescription ?? string.Empty);
                 return Result<T>.Failure(error);
             }
         }

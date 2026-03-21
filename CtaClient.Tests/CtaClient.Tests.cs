@@ -4,7 +4,7 @@ using Moq;
 using Moq.Contrib.HttpClient;
 using Moq.Protected;
 using System.Net;
-using System.Text.Json;
+using System.Net.Http.Json;
 using CtaClient.Config;
 using CtaClient.Models;
 
@@ -14,7 +14,6 @@ public class CtaClientTests
 {
     private readonly Mock<ILogger<CtaClient>> mockLogger;
     private readonly Mock<CtaEndpointFactory> mockEndpointFactory;
-    private readonly CtaApiResult<ArrivalsResponse> response;
     public CtaClientTests()
     {
         mockLogger = new Mock<ILogger<CtaClient>>();
@@ -26,15 +25,6 @@ public class CtaClientTests
         });
 
         mockEndpointFactory = new Mock<CtaEndpointFactory>(fakeApiSettings);
-
-        var arrivalsResponse = new ArrivalsResponse
-        {
-            Timestamp = DateTimeOffset.Now,
-            ErrorCode = ErrorCode.None,
-            Arrivals = [ new() { Route = Route.Red }],
-        };
-
-        response = new CtaApiResult<ArrivalsResponse> { Response = arrivalsResponse };
     }
 
     private Mock<CtaClient> CreateCtaClient(Mock<HttpMessageHandler> httpMessageHandler)
@@ -46,13 +36,20 @@ public class CtaClientTests
     [Fact]
     public async Task Client_GetArrivals_Runs()
     {
+        var arrivalsResponse = new ArrivalsResponse
+        {
+            Timestamp = DateTimeOffset.Now,
+            ErrorCode = ErrorCode.None,
+            Arrivals = [ new() { Route = Route.Red }],
+        };
+
         var httpMessageHandler = new Mock<HttpMessageHandler>();
         httpMessageHandler.Protected()
             .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(), ItExpr.IsAny<CancellationToken>())
             .ReturnsAsync(
                 new HttpResponseMessage(HttpStatusCode.OK)
                 {
-                    Content = new StringContent(JsonSerializer.Serialize(response))
+                    Content = JsonContent.Create(new { Response = arrivalsResponse })
                 });
 
         var request = new ArrivalsRequest
@@ -83,15 +80,13 @@ public class CtaClientTests
             Arrivals = [ new() { Route = Route.Red }]
         };
 
-        var ctaResponse = new CtaApiResult<FollowTrainResponse>(){ Response = followTrainResponse };
-
         var httpMessageHandler = new Mock<HttpMessageHandler>();
         httpMessageHandler.Protected()
             .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(), ItExpr.IsAny<CancellationToken>())
             .ReturnsAsync(
                 new HttpResponseMessage(HttpStatusCode.OK)
                 {
-                    Content = new StringContent(JsonSerializer.Serialize(ctaResponse))
+                    Content = JsonContent.Create(new { Response = followTrainResponse })
                 });
 
         var request = new FollowTrainRequest
