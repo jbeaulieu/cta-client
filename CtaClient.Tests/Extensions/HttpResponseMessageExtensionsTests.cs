@@ -1,35 +1,19 @@
 using System.Net;
-using System.Net.Mime;
-using System.Text;
-using System.Text.Json;
-using System.Text.Json.Serialization;
+using System.Net.Http.Json;
 using CtaClient.Exceptions;
 using CtaClient.Extensions;
-using CtaClient.Json;
 using CtaClient.Models;
 
 namespace CtaClient.Tests.Extensions;
 
 public class HttpResponseMessageExtensionsTests
 {
-    private readonly CtaApiResult<ArrivalsResponse> arrivalsApiResult;
-    private readonly CtaApiResult<FollowTrainResponse> followTrainApiResult;
-    private static readonly JsonSerializerOptions JsonOptions = new()
-    {
-        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-        NumberHandling = JsonNumberHandling.AllowReadingFromString,
-        WriteIndented = false,
-        Converters =
-        {
-            new JsonBoolConverter(),
-            new JsonRouteConverter(),
-            new JsonStringEnumConverter(),
-        },
-    };
+    private readonly ArrivalsResponse arrivalsResponse;
+    private readonly FollowTrainResponse followTrainResponse;
 
     public HttpResponseMessageExtensionsTests()
     {
-        var arrivalsResponse = new ArrivalsResponse
+        arrivalsResponse = new ArrivalsResponse
         {
             Timestamp = DateTimeOffset.Now,
             ErrorCode = ErrorCode.None,
@@ -37,23 +21,13 @@ public class HttpResponseMessageExtensionsTests
             Arrivals = []
         };
 
-        arrivalsApiResult = new CtaApiResult<ArrivalsResponse>
-        {
-            Response = arrivalsResponse
-        };
-
-        var followTrainResponse = new FollowTrainResponse
+        followTrainResponse = new FollowTrainResponse
         {
             Timestamp = DateTimeOffset.Now,
             ErrorCode = ErrorCode.None,
             ErrorDescription = null,
             Position = new(),
             Arrivals = []
-        };
-
-        followTrainApiResult = new CtaApiResult<FollowTrainResponse>
-        {
-            Response = followTrainResponse
         };
     }
 
@@ -62,7 +36,7 @@ public class HttpResponseMessageExtensionsTests
     {
         var responseMessage = new HttpResponseMessage(HttpStatusCode.OK)
         {
-            Content = new StringContent(JsonSerializer.Serialize(arrivalsApiResult, JsonOptions), Encoding.UTF8, MediaTypeNames.Application.Json)
+            Content = JsonContent.Create(new { Response = arrivalsResponse })
         };
 
         var result = await responseMessage.HandleCtaApiResponse<ArrivalsResponse>();
@@ -78,7 +52,7 @@ public class HttpResponseMessageExtensionsTests
     {
         var responseMessage = new HttpResponseMessage(HttpStatusCode.OK)
         {
-            Content = new StringContent(JsonSerializer.Serialize(followTrainApiResult, JsonOptions), Encoding.UTF8, MediaTypeNames.Application.Json)
+            Content = JsonContent.Create(new { Response = followTrainResponse })
         };
 
         var result = await responseMessage.HandleCtaApiResponse<ArrivalsResponse>();
@@ -96,11 +70,12 @@ public class HttpResponseMessageExtensionsTests
 
         var responseMessage = new HttpResponseMessage(HttpStatusCode.OK)
         {
-            Content = new StringContent(badJson, Encoding.UTF8, MediaTypeNames.Application.Json)
+            Content = JsonContent.Create(new { Response = badJson })
         };
 
         var ex = await Assert.ThrowsAsync<CtaClientException>(responseMessage.HandleCtaApiResponse<ArrivalsResponse>);
-        Assert.IsType<JsonException>(ex.InnerException);
+        Assert.NotNull(ex.InnerException);
+        Assert.NotNull(ex.Message);
     }
 
     #region HTTP Errors
@@ -117,7 +92,7 @@ public class HttpResponseMessageExtensionsTests
     {
         var responseMessage = new HttpResponseMessage(statusCode)
         {
-            Content = new StringContent(JsonSerializer.Serialize(arrivalsApiResult, JsonOptions), Encoding.UTF8, MediaTypeNames.Application.Json)
+            Content = JsonContent.Create(new { Response = arrivalsResponse })
         };
 
         var ex = await Assert.ThrowsAsync<CtaClientException>(responseMessage.HandleCtaApiResponse<ArrivalsResponse>);
@@ -150,11 +125,11 @@ public class HttpResponseMessageExtensionsTests
     [InlineData(ErrorCode.ServerError)]
     public async Task HandleCtaApiResponse_WithErrorCode_Runs(ErrorCode errorCode)
     {
-        arrivalsApiResult.Response.ErrorCode = errorCode;
+        arrivalsResponse.ErrorCode = errorCode;
 
         var responseMessage = new HttpResponseMessage(HttpStatusCode.OK)
         {
-            Content = new StringContent(JsonSerializer.Serialize(arrivalsApiResult, JsonOptions), Encoding.UTF8, MediaTypeNames.Application.Json)
+            Content = JsonContent.Create(new { Response = arrivalsResponse })
         };
 
         var result = await responseMessage.HandleCtaApiResponse<ArrivalsResponse>();

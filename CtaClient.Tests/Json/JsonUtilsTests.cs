@@ -1,5 +1,4 @@
 using System.Globalization;
-using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using CtaClient.Json;
@@ -7,30 +6,49 @@ using CtaClient.Models;
 
 namespace CtaClient.Tests.Json;
 
-public class JsonConverterTests
+public class JsonUtilsTests
 {
-    private static readonly JsonSerializerOptions JsonOptions = new()
+    /// <summary>
+    ///   Helper class for wrapping a valid CTA response.
+    ///   Used for test cases where we don't want to ignore the root element.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    private class CtaApiResult<T> where T : AbstractCtaResponse
     {
-        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-        NumberHandling = JsonNumberHandling.AllowReadingFromString,
-        WriteIndented = false,
-        Converters =
-        {
-            new JsonBoolConverter(),
-            new JsonRouteConverter(),
-            new JsonStringEnumConverter(),
-        },
-    };
+        [JsonPropertyName("ctatt")]
+        public required T Response { get; set; }
+    }
 
     [Fact]
     public void Deserialize_CtaApiResult_ArrivalsResponse_Runs()
     {
         string rootResponse = "{\"ctatt\":{\"tmst\":\"2025-12-05T17:54:32\",\"errCd\":\"0\",\"errNm\":null,\"eta\":[{\"staId\":\"41320\",\"stpId\":\"30258\",\"staNm\":\"Belmont\",\"stpDe\":\"Service toward Loop\",\"rn\":\"523\",\"rt\":\"P\",\"destSt\":\"30203\",\"destNm\":\"Loop\",\"trDr\":\"5\",\"prdt\":\"2025-12-05T17:54:20\",\"arrT\":\"2025-12-05T17:55:20\",\"isApp\":\"1\",\"isSch\":\"0\",\"isDly\":\"0\",\"isFlt\":\"0\",\"flags\":null,\"lat\":\"41.94775\",\"lon\":\"-87.65363\",\"heading\":\"179\"},{\"staId\":\"41320\",\"stpId\":\"30255\",\"staNm\":\"Belmont\",\"stpDe\":\"Service toward Howard or Linden\",\"rn\":\"924\",\"rt\":\"Red\",\"destSt\":\"30173\",\"destNm\":\"Howard\",\"trDr\":\"1\",\"prdt\":\"2025-12-05T17:53:44\",\"arrT\":\"2025-12-05T17:55:44\",\"isApp\":\"0\",\"isSch\":\"0\",\"isDly\":\"0\",\"isFlt\":\"0\",\"flags\":null,\"lat\":\"41.93161\",\"lon\":\"-87.65307\",\"heading\":\"357\"}]}}";
 
-        var result = JsonSerializer.Deserialize<CtaApiResult<ArrivalsResponse>>(rootResponse, JsonOptions);
+        var result = JsonUtils.Deserialize<CtaApiResult<ArrivalsResponse>>(rootResponse, ignoreRoot: false);
 
         Assert.IsType<CtaApiResult<ArrivalsResponse>>(result);
         Assert.IsType<ArrivalsResponse>(result.Response);
+    }
+
+    [Fact]
+    public void Deserialize_CtaApiResult_ArrivalsResponse_IgnoreRoot_Runs()
+    {
+        string rootResponse = "{\"ctatt\":{\"tmst\":\"2025-12-05T17:54:32\",\"errCd\":\"0\",\"errNm\":null,\"eta\":[{\"staId\":\"41320\",\"stpId\":\"30258\",\"staNm\":\"Belmont\",\"stpDe\":\"Service toward Loop\",\"rn\":\"523\",\"rt\":\"P\",\"destSt\":\"30203\",\"destNm\":\"Loop\",\"trDr\":\"5\",\"prdt\":\"2025-12-05T17:54:20\",\"arrT\":\"2025-12-05T17:55:20\",\"isApp\":\"1\",\"isSch\":\"0\",\"isDly\":\"0\",\"isFlt\":\"0\",\"flags\":null,\"lat\":\"41.94775\",\"lon\":\"-87.65363\",\"heading\":\"179\"},{\"staId\":\"41320\",\"stpId\":\"30255\",\"staNm\":\"Belmont\",\"stpDe\":\"Service toward Howard or Linden\",\"rn\":\"924\",\"rt\":\"Red\",\"destSt\":\"30173\",\"destNm\":\"Howard\",\"trDr\":\"1\",\"prdt\":\"2025-12-05T17:53:44\",\"arrT\":\"2025-12-05T17:55:44\",\"isApp\":\"0\",\"isSch\":\"0\",\"isDly\":\"0\",\"isFlt\":\"0\",\"flags\":null,\"lat\":\"41.93161\",\"lon\":\"-87.65307\",\"heading\":\"357\"}]}}";
+
+        var result = JsonUtils.Deserialize<ArrivalsResponse>(rootResponse, ignoreRoot: true);
+
+        Assert.IsType<ArrivalsResponse>(result);
+
+        Assert.IsType<DateTimeOffset>(result.Timestamp);
+        Assert.Equal(DateTimeOffset.Parse("2025-12-05T17:54:32", new CultureInfo("en-US")), result.Timestamp);
+
+        Assert.IsType<ErrorCode>(result.ErrorCode);
+        Assert.Equal(ErrorCode.None, result.ErrorCode);
+
+        Assert.Null(result.ErrorDescription);
+
+        Assert.IsType<List<Arrival>>(result.Arrivals);
+        Assert.Equal(2, result.Arrivals.Count);
     }
 
     [Fact]
@@ -38,7 +56,7 @@ public class JsonConverterTests
     {
         string rootResponse = "{\"tmst\":\"2025-12-05T17:54:32\",\"errCd\":\"100\",\"errNm\":\"Required parameter 'key' is missing.\",\"eta\":[{\"staId\":\"41320\",\"stpId\":\"30258\",\"staNm\":\"Belmont\",\"stpDe\":\"Service toward Loop\",\"rn\":\"523\",\"rt\":\"P\",\"destSt\":\"30203\",\"destNm\":\"Loop\",\"trDr\":\"5\",\"prdt\":\"2025-12-05T17:54:20\",\"arrT\":\"2025-12-05T17:55:20\",\"isApp\":\"1\",\"isSch\":\"0\",\"isDly\":\"0\",\"isFlt\":\"0\",\"flags\":null,\"lat\":\"41.94775\",\"lon\":\"-87.65363\",\"heading\":\"179\"},{\"staId\":\"41320\",\"stpId\":\"30255\",\"staNm\":\"Belmont\",\"stpDe\":\"Service toward Howard or Linden\",\"rn\":\"924\",\"rt\":\"Red\",\"destSt\":\"30173\",\"destNm\":\"Howard\",\"trDr\":\"1\",\"prdt\":\"2025-12-05T17:53:44\",\"arrT\":\"2025-12-05T17:55:44\",\"isApp\":\"0\",\"isSch\":\"0\",\"isDly\":\"0\",\"isFlt\":\"0\",\"flags\":null,\"lat\":\"41.93161\",\"lon\":\"-87.65307\",\"heading\":\"357\"}]}";
 
-        var result = JsonSerializer.Deserialize<ArrivalsResponse>(rootResponse, JsonOptions);
+        var result = JsonUtils.Deserialize<ArrivalsResponse>(rootResponse);
 
         Assert.IsType<ArrivalsResponse>(result);
 
@@ -60,7 +78,7 @@ public class JsonConverterTests
     {
         string rootResponse = "{\"staId\":\"41320\",\"stpId\":\"30258\",\"staNm\":\"Belmont\",\"stpDe\":\"Service toward Loop\",\"rn\":\"523\",\"rt\":\"P\",\"destSt\":\"30203\",\"destNm\":\"Loop\",\"trDr\":\"5\",\"prdt\":\"2025-12-05T17:54:20\",\"arrT\":\"2025-12-05T17:55:20\",\"isApp\":\"1\",\"isSch\":\"0\",\"isDly\":\"0\",\"isFlt\":\"0\",\"flags\":null,\"lat\":\"41.94775\",\"lon\":\"-87.65363\",\"heading\":\"179\"}";
 
-        var result = JsonSerializer.Deserialize<Arrival>(rootResponse, JsonOptions);
+        var result = JsonUtils.Deserialize<Arrival>(rootResponse);
 
         Assert.IsType<Arrival>(result);
 
@@ -129,7 +147,7 @@ public class JsonConverterTests
     {
         string rootResponse = "{\"ctatt\":{\"tmst\":\"2026-02-27T09:50:34\",\"errCd\":\"100\",\"errNm\":\"Required parameter 'key' is missing.\",\"position\":{\"lat\":\"41.93739\",\"lon\":\"-87.65332\",\"heading\":\"177\"},\"eta\":[{\"staId\":\"41220\",\"stpId\":\"30234\",\"staNm\":\"Fullerton\",\"stpDe\":\"Service toward 95th/Dan Ryan\",\"rn\":\"810\",\"rt\":\"Red Line\",\"destSt\":\"30089\",\"destNm\":\"95th/Dan Ryan\",\"trDr\":\"5\",\"prdt\":\"2026-02-27T09:49:10\",\"arrT\":\"2026-02-27T09:51:10\",\"isApp\":\"0\",\"isSch\":\"0\",\"isDly\":\"0\",\"isFlt\":\"0\",\"flags\":null},{\"staId\":\"40650\",\"stpId\":\"30126\",\"staNm\":\"North/Clybourn\",\"stpDe\":\"Service toward 95th/Dan Ryan\",\"rn\":\"810\",\"rt\":\"Red Line\",\"destSt\":\"30089\",\"destNm\":\"95th/Dan Ryan\",\"trDr\":\"5\",\"prdt\":\"2026-02-27T09:49:10\",\"arrT\":\"2026-02-27T09:54:10\",\"isApp\":\"0\",\"isSch\":\"0\",\"isDly\":\"0\",\"isFlt\":\"0\",\"flags\":null}]}}";
 
-        var result = JsonSerializer.Deserialize<CtaApiResult<FollowTrainResponse>>(rootResponse, JsonOptions);
+        var result = JsonUtils.Deserialize<CtaApiResult<FollowTrainResponse>>(rootResponse);
 
         Assert.IsType<CtaApiResult<FollowTrainResponse>>(result);
         Assert.IsType<FollowTrainResponse>(result.Response);
@@ -140,7 +158,7 @@ public class JsonConverterTests
     {
         string rootResponse = "{\"tmst\":\"2026-02-27T09:50:34\",\"errCd\":\"100\",\"errNm\":\"Required parameter 'key' is missing.\",\"position\":{\"lat\":\"41.93739\",\"lon\":\"-87.65332\",\"heading\":\"177\"},\"eta\":[{\"staId\":\"41220\",\"stpId\":\"30234\",\"staNm\":\"Fullerton\",\"stpDe\":\"Service toward 95th/Dan Ryan\",\"rn\":\"810\",\"rt\":\"Red Line\",\"destSt\":\"30089\",\"destNm\":\"95th/Dan Ryan\",\"trDr\":\"5\",\"prdt\":\"2026-02-27T09:49:10\",\"arrT\":\"2026-02-27T09:51:10\",\"isApp\":\"0\",\"isSch\":\"0\",\"isDly\":\"0\",\"isFlt\":\"0\",\"flags\":null},{\"staId\":\"40650\",\"stpId\":\"30126\",\"staNm\":\"North/Clybourn\",\"stpDe\":\"Service toward 95th/Dan Ryan\",\"rn\":\"810\",\"rt\":\"Red Line\",\"destSt\":\"30089\",\"destNm\":\"95th/Dan Ryan\",\"trDr\":\"5\",\"prdt\":\"2026-02-27T09:49:10\",\"arrT\":\"2026-02-27T09:54:10\",\"isApp\":\"0\",\"isSch\":\"0\",\"isDly\":\"0\",\"isFlt\":\"0\",\"flags\":null}]}";
 
-        var result = JsonSerializer.Deserialize<FollowTrainResponse>(rootResponse, JsonOptions);
+        var result = JsonUtils.Deserialize<FollowTrainResponse>(rootResponse);
 
         Assert.IsType<FollowTrainResponse>(result);
 
@@ -164,7 +182,7 @@ public class JsonConverterTests
     {
         string rootResponse = "{\"lat\":\"41.93739\",\"lon\":\"-87.65332\",\"heading\":\"177\"}";
 
-        var result = JsonSerializer.Deserialize<TrainPosition>(rootResponse, JsonOptions);
+        var result = JsonUtils.Deserialize<TrainPosition>(rootResponse);
 
         Assert.IsType<TrainPosition>(result);
 
@@ -179,53 +197,5 @@ public class JsonConverterTests
 
         Assert.IsType<int>(result.Heading);
         Assert.Equal(177, result.Heading);
-    }
-
-    [Theory]
-    [InlineData("\"true\"")]
-    [InlineData("\"1\"")]
-    [InlineData("\"17\"")]
-    [InlineData("\"-5\"")]
-    public void TryParseStringTests_TruthyValues(string value)
-    {
-        byte[] bytes = Encoding.UTF8.GetBytes(value);
-
-        Utf8JsonReader reader = new(bytes.AsSpan());
-        reader.Read();
-
-        var result = JsonBoolConverter.TryParseString(reader);
-
-        Assert.True(result);
-    }
-
-    [Theory]
-    [InlineData("\"false\"")]
-    [InlineData("\"0\"")]
-    public void TryParseStringTests_FalsyValues(string value)
-    {
-        byte[] bytes = Encoding.UTF8.GetBytes(value);
-
-        Utf8JsonReader reader = new(bytes.AsSpan());
-        reader.Read();
-
-        var result = JsonBoolConverter.TryParseString(reader);
-
-        Assert.False(result);
-    }
-
-    [Theory]
-    [InlineData("\"Nonboolean value\"")]
-    [InlineData("\"1.007\"")]
-    public void TryParseStringTests_Throws(string value)
-    {
-        Assert.Throws<JsonException>(() =>
-        {
-            byte[] bytes = Encoding.UTF8.GetBytes(value);
-
-            Utf8JsonReader reader = new(bytes.AsSpan());
-            reader.Read();
-
-            JsonBoolConverter.TryParseString(reader);
-        });
     }
 }

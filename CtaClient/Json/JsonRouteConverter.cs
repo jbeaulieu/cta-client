@@ -34,7 +34,7 @@ internal class JsonRouteConverter : JsonConverter<Route>
     ///   responses, routes are serialized using human-readable values, i.e. "Brown Line" for brown line trains.
     ///   This handler will parse both sets of values into a standard <see cref="Route" /> enum.
     /// </remarks>
-    internal static Route TryParseRoute(Utf8JsonReader reader)
+    private static Route TryParseRoute(Utf8JsonReader reader)
     {
         var input = reader.GetString() ?? throw new JsonException("[JsonRouteConverter] Encountered a null value");
 
@@ -51,7 +51,7 @@ internal class JsonRouteConverter : JsonConverter<Route>
             _ when input == Route.Green.GetServiceId() || input == Route.Green.GetName()                 => Route.Green,
             _ when input == Route.Orange.GetServiceId() || input == Route.Orange.GetName()               => Route.Orange,
             _ when input == Route.Pink.GetServiceId() || input == Route.Pink.GetName()                   => Route.Pink,
-            _ when input == Route.Purple.GetServiceId() || input == Route.Red.GetName()                  => Route.Purple,
+            _ when input == Route.Purple.GetServiceId() || input == Route.Purple.GetName()                  => Route.Purple,
             _ when input == Route.PurpleExpress.GetServiceId() || input == Route.PurpleExpress.GetName() => Route.PurpleExpress,
             _ when input == Route.Yellow.GetServiceId() || input == Route.Yellow.GetName()               => Route.Yellow,
             _ => throw new JsonException($"[JsonRouteConverter] Could not deserialize JSON value {reader.GetString()} to Route"),
