@@ -1,10 +1,24 @@
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using System.Text.Json.Serialization;
 
 namespace CtaClient.Json;
 
 internal static class JsonUtils
 {
+    private static readonly JsonSerializerOptions DefaultJsonOptions = new()
+    {
+        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+        NumberHandling = JsonNumberHandling.AllowReadingFromString,
+        WriteIndented = false,
+        Converters =
+        {
+            new JsonBoolConverter(),
+            new JsonRouteConverter(),
+            new JsonStringEnumConverter(),
+        },
+    };
+
     /// <summary>
     ///   Attempts to deserialize a json string to an object of type T, optionally ignoring the root element of the json string.
     /// </summary>
@@ -13,9 +27,11 @@ internal static class JsonUtils
     ///   are returned inside of a "ctatt" object, while Alerts API responses are returned inside of a "CTAAlerts" object.
     ///   Ignoring the root element allows us to avoid needing separate classes for each of these named containers.
     /// </remarks>
-    internal static T Deserialize<T>(string json, JsonSerializerOptions? options = null, bool ignoreRoot = false) where T : class
+    internal static T Deserialize<T>(string json, JsonSerializerOptions? jsonOptions = null, bool ignoreRoot = false) where T : class
     {
         T? result = null;
+
+        JsonSerializerOptions options = jsonOptions ?? DefaultJsonOptions;
 
         if (ignoreRoot)
         {

@@ -1,5 +1,3 @@
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using CtaClient.Exceptions;
 using CtaClient.Json;
 using CtaClient.Models;
@@ -8,19 +6,6 @@ namespace CtaClient.Extensions;
 
 internal static class HttpResponseMessageExtensions
 {
-    private static readonly JsonSerializerOptions JsonOptions = new()
-    {
-        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-        NumberHandling = JsonNumberHandling.AllowReadingFromString,
-        WriteIndented = false,
-        Converters =
-        {
-            new JsonBoolConverter(),
-            new JsonRouteConverter(),
-            new JsonStringEnumConverter(),
-        },
-    };
-
     /// <summary>
     ///   Validates that the response from the CTA API indicates success, and extracts the response
     ///     model if so. If the response indicates an error, either from the response status code or
@@ -38,7 +23,7 @@ internal static class HttpResponseMessageExtensions
             response.EnsureSuccessStatusCode();
 
             var responseContent = await response.Content.ReadAsStringAsync();
-            var result = JsonUtils.Deserialize<T>(responseContent, JsonOptions, ignoreRoot: true);
+            var result = JsonUtils.Deserialize<T>(responseContent, ignoreRoot: true);
 
             if(result.ErrorCode == ErrorCode.None)
             {
